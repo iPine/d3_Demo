@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>D3 Page Template</title>
+	<script type="text/javascript" src="d3/d3.js"></script>
+	<style>
+		div.bar{
+			display:inline-block;/*既可以排列在同一行，也能设置宽高属性*/
+			width: 20px;
+			height: 75px;
+			background-color: teal;
+			margin-right: 2px;
+		}
+		svg.pumpkin{
+			fill:yellow;//色彩填充
+			stroke:orange;//描边
+		}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		//d3.select("body").append("p").text("New paragraph!");
+	/*	var dataset=[];
+		for(var i = 0; i < 25; i++){
+			var newNumber =Math.round( Math.random() * 30);//随机生成0-30的整数
+			dataset.push(newNumber);//把新数值添加到数组中
+		}*/
+		//加载数据方法
+		/*d3.csv("data/food.csv",function(error,data){
+			if(error){
+				console.log(error);
+			}
+			else{
+				console.log(data);
+				//dataset=data;//回调函数边加载边运行，这样可得到加载成功后的数据
+			}
+			});*/
+   
+/*div展示数据部分代码
+			d3.select("body").selectAll("div")
+			.data(dataset)//将数据绑定到DOM元素，用.data()方法
+			.enter()//用这个方法占位
+			.append("div")//创建新html元素
+			//.text("New paragraph!");
+			//调用data()，可随时创建一个接收d为输入的匿名函数，与当前元素对应
+			//.text(function(d){return "I can count up to "+ d;})
+			.style("color",function(d){
+				if(d>10)
+					return "purple";
+				else
+					return "green";})
+			//D3中给HTML的div尖括弧里的属性“class”应用bar类
+			.attr("class","bar")//设定属性
+			//<div class="bar"></div>
+			//为特殊单个属性设置值
+			.style("height",function(d){
+				var barHeight = d * 5;
+				return barHeight + "px";
+			});
+*/	
+
+//绘制SVG		 
+	var dataset = [5,10,15,20,25];
+	//将新建的"svg"元素以及它的宽高度都保存在变量里
+	var w = 500;
+	var h = 100;
+	var svg = d3.select("body").append("svg").attr("width",w).attr("height",h);
+	var circles = svg.selectAll("circle")
+					.data(dataset)
+					.enter()
+					.append("circle")
+					.attr("fill","yellow")
+					.attr("stroke","orange");
+	//i是D3自动生成的计数器（就是当前元素的索引值，从0开始），名字可以随便改
+	//要使用这个索引必须当做匿名函数的参数传入
+	circles.attr("cx",function(d,i){
+				return (i * 50) + 25; 
+			})
+			.attr("cy",h/2)
+			.attr("r",function(d){
+				return d;
+			})
+			.attr("stroke-width",function(d){
+				return d/2;
+			});		
+	</script>
+</body>
+</html>>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>My SVG bar chart</title>
+	<script type="text/javascript" src="d3/d3.js"></script>
+
+</head>
+<body>
+	<script type="text/javascript">
+		var svgWidth = 500;
+		var svgHeight = 100;
+		var barPadding = 1;
+		var dataset = [5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+11, 12, 15, 20, 18, 17, 16, 18, 23, 25];
+	//创建SVG元素
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width",svgWidth)
+					.attr("height",svgHeight);
+		svg.selectAll("rect")
+			.data(dataset)
+			.enter()
+			.append("rect")
+		/*除了这种冗余的写法还可选择多值映射机制
+			.attr("x",function(d,i){
+				//return i * 21;//这样写太死，条形数多了会有图形放不下跑到svg画布外
+				return i * (svgWidth / dataset.length);//这样可使所有数据成比例缩放
+			})
+			//这样定基坐标，条形图是往下变化的
+			//.attr("y",0)
+			//y轴的基坐标改成画布的高度减去数据值的本身
+			.attr("y",function(d){
+				return svgHeight - d * 4;
+			})
+			//.attr("width",20)
+			//设置条形宽度，使其也成比例缩放
+			.attr("width",svgWidth / dataset.length - barPadding)
+			//.attr("height",100);
+			//将数据反映到条形图高度上
+			.attr("height",function(d){
+				return d * 4;//放大4倍
+			})
+			//.attr("fill","teal");
+			//使颜色也随数值变化,颜色和条形长度双重标识
+			.attr("fill",function(d){
+				//可知道如何将数据转换成颜色，改变的是蓝色通道值
+				return "rgb(225,225,"+ (d * 10) +")";
+			});
+		*/
+			//多值映射写法，将所有的都封装在对象中
+			.attr({
+				x: function(d,i) {return i * (svgWidth / dataset.length); },
+				y: function(d) {return svgHeight - (d * 4); },
+				width: svgWidth / dataset.length - barPadding,
+				height: function(d) {return d * 4; },
+				fill: function(d) {return "rgb(0,0,"+ (d * 10) +")";}
+			});
+		//加标签，把条形图对应的数据加上去
+		svg.selectAll("text")
+			.data(dataset)
+			.enter()
+			.append("text")
+			//使用text()方法让每个文本元素都包含一个数据值
+			.text(function(d){
+				return d;
+			})
+			//定位文本元素的位置
+			//.attr({
+			//	x: function(d,i){return i * (svgWidth / dataset.length);},
+			//	y:function(d) {return svgHeight - d * 4;}
+			//});
+			//数据标签出来了，但是有些看不到。因此将数字标签往下移一点
+			.attr({
+				x: function(d,i){return i * (svgWidth / dataset.length) + (svgWidth / dataset.length - barPadding) / 2;},
+				y:function(d) {return svgHeight - d * 4 + 14;},
+				//位置好了，但是由于字体颜色，还是看不清
+				"font-family": "sans-serif",
+				"font-size": "12px",
+				fill: "white",
+				"text-anchor": "middle"//使数字标签居中
+			});
+
+	</script>
+</body>
+</html>>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Scatter Diagram</title>
+	<!--散点图，是二维数据-->
+	<script type="text/javascript" src="d3/d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var svgHeight = 200;
+		var svgWight = 500;
+		var dataset = [[5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
+[410, 12], [475, 44], [25, 67], [85, 21], [220, 88]];
+		//创建svg画布
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWight,
+						height: svgHeight
+					});
+		//为每个数据点创建圆,并设定其半径，圆心对应x轴，y轴值
+		svg.selectAll("circle")
+			.data(dataset)
+			.enter()
+			.append("circle")
+			.attr({
+				cx: function(d){return d[0];},//此时的d是大数组中的小数组
+				cy: function(d){return d[1];},
+				//r: 5
+				//假设d[1]表示面积，用svgHeight - d[1]是为了让大圆在上面，小圆在下面
+				r: function(d){return Math.sqrt(svgHeight - d[1]);}
+			});
+		/*每个圆的大小应该不同；
+		想到用半径大小来反映数据，虽然简单但这是错误的，应该用面积;
+		即知道面积反过来算出半径：s=pi*r*r */
+
+		//加数据标签
+		svg.selectAll("text")
+			.data(dataset)
+			.enter()
+			.append("text")
+			.text(function(d){
+				return d[0] + "," + d[1];
+			})
+			.attr({
+				x: function(d){return d[0];},
+				y: function(d){return d[1];},
+				fill: "red",
+				"font-family": "sans-serif",
+				"font-size": "11px"
+			});
+
+
+	</script>
+</body>
+</html>
