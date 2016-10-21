@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>update axes with circles</title>
+	<script type="text/javascript" src="../d3/d3.js"></script>
+	<style type="text/css">
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: black;
+		shape-rendering: crispEdges;
+	}
+	.axis text {
+		font-family: sans-serif;
+		font-size: 11px;
+	}
+	</style>
+</head>
+<body>
+	<p>Click this text to update the chart with new data values as many times as you like!</p>
+	<script type="text/javascript">
+	    var svgHeight = 200;
+		var svgWight = 500;
+		/*var dataset = [[5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
+[410, 12], [475, 44], [25, 67], [85, 21], [220, 88],[600,150]];*/
+		//suijishengchengshu
+		var dataset = [];
+		var numDataPoints = 50;
+		var xRange = Math.random() * 1000;
+		var yRange = Math.random() * 1000;
+		for(var i = 0; i < numDataPoints; i++)
+		{
+			var newNumber1 = Math.floor(Math.random() * xRange);
+			var newNumber2 = Math.floor(Math.random() * yRange);
+			dataset.push([newNumber1,newNumber2]);
+		}
+		var padding = 30;//ÒòÎªÓÐÐ©Í¼±»ÇÐµôÁË£¬Òò´ËÒýÈë¸Ã±äÁ¿
+		//ÎªÔ²ÐÄµÄxÖá×ø±êÉèÖÃ±ÈÀý³ßº¯Êý
+		var xScale = d3.scale.linear()
+							.domain([0,d3.max(dataset,function(d){ return d[0];})])
+							//ÒýÈëpaddingºó£¬·¶Î§¾Í±äÁË,Ô¶Àësvg»­²¼ÖÜÎ§
+							//.range([0,svgWight]);
+							.range([padding,svgWight - padding * 2.5]);
+		//ÎªÔ²ÐÄµÄyÖá×ø±êÉèÖÃ±ÈÀý³ßº¯Êý
+		var yScale = d3.scale.linear()
+							.domain([0,d3.max(dataset,function(d){ return d[1];})])
+							//ÏÖÔÚÊÇy½ÏÐ¡µÄÔÚÉÏ·½£¬½«Æä·´×ª¹ýÀ´,Ê¹Æä·ûºÏ³£¹æË¼Â·£¬¼´´ÓÏÂÍùÉÏÔö
+							//.range([0,svgHeight]);
+							//ÒýÈëpaddingºó£¬·¶Î§¾Í±äÁË
+							//.range([svgHeight,0]);
+							.range([svgHeight - padding,padding]);
+		//ÎªÔ²ÐÄµÄ°ë¾¶ÉèÖÃ±ÈÀý³ßº¯Êý
+		var rScale = d3.scale.linear()
+							.domain([0,d3.max(dataset,function(d){ return d[1];})])
+							.range([2,7]);
+		//´´½¨svg»­²¼
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWight,
+						height: svgHeight
+					});
+
+		//因为有些圆会到数轴外面去，解决方法是：用剪切路径(蒙版)
+		//1.定义剪切路径
+				svg.append("clipPath")
+					.attr("id","chart-area")
+		//2.在clipPath中，创建并添加新的rect(蒙版大小)
+					.append("rect")
+					.attr({
+						x: padding,
+						y: padding,
+						width: svgWight - padding * 3,
+						height: svgHeight - padding * 2,
+					});
+		//3.将蒙版应用给每个圆形，简洁方法是将所有圆放在分组g中，然后给g添加蒙版
+		//´´½¨Ô²£¬²¢ÉèÖÃÊôÐÔ
+		svg.append("g")
+		//指定g的ID为circles
+		//添加对clipPath的引用
+			.attr("id","circles")
+			.attr("clip-path","url(#chart-area)")
+			.selectAll("circle")
+			.data(dataset)
+			.enter()
+			.append("circle")
+			.attr({
+				cx: function(d){return xScale(d[0]);},//Ê¹ÓÃËõ·ÅºóµÄÖµ
+				cy: function(d){return yScale(d[1]);},//Ê¹ÓÃËõ·ÅºóµÄÖµ
+				r: function(d){return rScale(d[1]);},
+				fill:"teal"
+			});
+	
+		var formatAsPercentage = d3.format(".1%");
+		var xAxis = d3.svg.axis()
+						.scale(xScale)
+						.orient("bottom")
+						.ticks(5)
+						.tickFormat(formatAsPercentage);;
+		svg.append("g")
+			.attr("class","x axis")//ÎªxÖá´´½¨ÀàÃû
+			//Æ½ÒÆ
+			.attr("transform","translate(0," + (svgHeight - padding) + ")")
+			.call(xAxis);
+
+		//
+		var yAxis = d3.svg.axis()
+						.scale(yScale)
+						.orient("left")
+						.ticks(5);
+		svg.append("g")
+			.attr("class","y axis")//ÎªyÖá´´½¨ÀàÃû
+			.attr("transform","translate("+ padding + ",0)")
+			.call(yAxis);
+		//Îª"p"±êÇ©Ìí¼ÓÏìÓ¦ÊÂ¼þ
+		d3.select("p")
+			.on("click",function(d){
+		//¸üÐÂÊý¾Ý
+				//var numValues = dataset.length;
+				var dataset = [];
+				var xRange = Math.random() * 1000;
+				var yRange = Math.random() * 1000;
+				for(var i = 0; i < numDataPoints ;i++){
+					var newNumber1 = Math.floor(Math.random() * xRange);
+					var newNumber2 = Math.floor(Math.random() * yRange);
+					dataset.push([newNumber1,newNumber2]);
+				}
+
+		//¸üÐÂ±ÈÀý³ß
+				xScale.domain([0,d3.max(dataset,function(d){ return d[0];})]);
+				yScale.domain([0,d3.max(dataset,function(d){ return d[1];})]);
+				rScale.domain([0,d3.max(dataset,function(d){ return d[1];})]);
+
+		//¸üÐÂÍ¼ÐÎ
+				d3.selectAll("circle")
+					.data(dataset)
+					.transition()
+					.duration(1000)
+					//each()函数是用来在过渡开始或结束时进行操作
+					//each("start",)里面不能在设置过渡了
+					.each("start",function(){
+						d3.select(this)//选择当前元素
+							.attr({
+								fill: "magenta",
+								//r: function(d){return rScale(d[1]) * 1.2;},
+								r: 7
+							});
+					})
+					.attr({
+						cx: function(d){return xScale(d[0]);},				 		
+						cy: function(d){return yScale(d[1]);},
+						//r: function(d){return rScale(d[1]);}
+					})
+              /*	   	d3.select(this)
+							.transition()
+							.duration(250)
+							.attr({
+								fill: "teal",
+								r: function(d){return rScale(d[1]);},
+							});*/
+					//可以这样写，效果是一样的
+					.transition()
+					.duration(250)
+					.attr({
+						fill: "teal",
+								r: function(d){return rScale(d[1]);},
+					});
+		//¸üÐÂÊýÖá
+				svg.select(".x.axis")//Ñ¡Ôñµ±Ç°Òª¸üÐÂµÄÊýÖá
+					.transition()
+					.duration(1000)
+					.call(xAxis);//µ÷ÓÃÊÊµ±µÄÊýÖáÉú³ÉÆ÷
+
+				svg.select(".y.axis")
+					.transition()
+					.duration(1000)
+					.call(yAxis);
+	
+			});
+		
+	</script>
+</body>
+</html>
