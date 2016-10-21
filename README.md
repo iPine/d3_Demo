@@ -7,3 +7,5 @@ first D3-demo
 click and dynamic
 
 transition and axes
+
+add data values to barchart
