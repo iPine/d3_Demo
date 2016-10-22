@@ -9,3 +9,8 @@ click and dynamic
 transition and axes
 
 add data values to barchart
+
+delete data from barchart
+
+#### day-3
+data join
