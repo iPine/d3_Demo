@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Delete data values from my bar chart</title>
+	<script type="text/javascript" src="../d3/d3.js"></script>
+
+</head>
+<body>
+<!--通过事件监听器实现交互
+	响应鼠标事件，任何元素都可以-->
+	<p> Click on this text to delete data values from the chart!</p>
+
+	<script type="text/javascript">
+		var svgWidth = 600;
+		var svgHeight = 250;
+		var dataset = [5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+11, 12, 15, 20, 18, 17, 16, 18, 23, 25];
+
+		var xScale = d3.scale.ordinal()
+						//d3.range()是生成连续数值数组的方法
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([0,svgWidth],0.05);
+
+		var yScale = d3.scale.linear()
+						.domain([0,d3.max(dataset)])
+						.range([d3.min(dataset,function(d){return d;}),svgHeight-d3.min(dataset,function(d){return d;})]);
+						//.range([0,svgHeight]);
+	//创建SVG元素
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width",svgWidth)
+					.attr("height",svgHeight);
+		svg.selectAll("rect")
+			.data(dataset)
+			.enter()
+			.append("rect")
+	//多值映射写法，将所有的都封装在对象中
+			.attr({
+				//x: function(d,i) {return i * (svgWidth / dataset.length); },
+				x: function(d,i) {return xScale(i); },
+				y: function(d) {return svgHeight - yScale(d); },
+				width: xScale.rangeBand(),
+				height: function(d){return yScale(d); },
+				fill: function(d) {return "rgb(0,0,"+ (d * 10) +")";}
+			});
+	//加标签，把条形图对应的数据加上去
+		svg.selectAll("text")
+			.data(dataset)
+			.enter()
+			.append("text")
+			.text(function(d){
+				return d;
+			})
+			.attr({
+				x: function(d,i){
+								return xScale(i) + xScale.rangeBand() / 2;
+							},
+				y: function(d) {return svgHeight - yScale(d) + 14; },
+				"font-family": "sans-serif",
+				"font-size": "12px",
+				fill: "white",
+				"text-anchor": "middle"//使数字标签居中
+			});
+
+	//选中"p"元素，并为其添加一个事件监听器
+			d3.select("p")
+				.on("click",function(){
+ 				//先更新数据集，指明要删除
+ 					dataset.shift();
+				//更新比例尺
+					//要往数组中增加(删除)数据,必须对x轴，y轴的比例尺进行更新
+					xScale.domain(d3.range(dataset.length));
+					yScale.domain([0,d3.max(dataset)]);
+
+				//更新所有矩形，选中删除的元素，将其退出
+						//选择删除值，bars中保存了更新元素集
+						var bars = svg.selectAll("rect")
+									.data(dataset);
+						//退出删除值
+						bars.exit()
+							.transition()
+							.duration(500)
+							.attr("x",svgWidth)//在SVG最右边，使其不可见，然后有平滑过渡效果
+							.remove();//彻底删除
+				//更新条型图的所有属性
+						bars.transition()
+							.duration(500)
+							.attr({
+								x: function(d,i){return xScale(i);},
+								y: function(d){return svgHeight - yScale(d);},
+								width: xScale.rangeBand(),
+								height: function(d){return yScale(d);}
+							});
+
+				//选择并删除标签
+						var content = svg.selectAll("text")
+											.data(dataset);
+						content.exit()
+								.transition()
+								.duration(500)
+								.attr("x",svgWidth)
+								.remove();
+				//更新所有标签
+						content.transition()
+								.duration(500)
+								.text(function(d){return d;})
+								.attr({
+									x: function(d,i){return xScale(i) + xScale.rangeBand() / 2;},
+									y: function(d){return svgHeight - yScale(d) + 14;}
+								});		
+
+				});
+	</script>
+</body>
+</html>>
