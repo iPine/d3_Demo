@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Data Join</title>
+	<script type="text/javascript" src="../d3/d3.js"></script>
+
+</head>
+<body>
+<!--通过事件监听器实现交互
+	响应鼠标事件，任何元素都可以-->
+	<p> Click on this text to delete data values from the chart!</p>
+
+	<script type="text/javascript">
+		var svgWidth = 600;
+		var svgHeight = 250;
+
+		var dataset = [{ key: 0, value: 5 },
+						{ key: 1, value: 10 },
+						{ key: 2, value: 13 },
+						{ key: 3, value: 19 },
+						{ key: 4, value: 21 },
+						{ key: 5, value: 25 },
+						{ key: 6, value: 22 },
+						{ key: 7, value: 18 },
+						{ key: 8, value: 15 },
+						{ key: 9, value: 13 },
+						{ key: 10, value: 11 },
+						{ key: 11, value: 12 },
+						{ key: 12, value: 15 },
+						{ key: 13, value: 20 },
+						{ key: 14, value: 18 },
+						{ key: 15, value: 17 },
+						{ key: 16, value: 16 },
+						{ key: 17, value: 18 },
+						{ key: 18, value: 23 },
+						{ key: 19, value: 25 } ];
+		//定义键函数
+		var key = function(d) {return d.key;}
+
+		var xScale = d3.scale.ordinal()
+						//d3.range()是生成连续数值数组的方法
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([0,svgWidth],0.05);
+
+		var yScale = d3.scale.linear()
+						.domain([0,d3.max(dataset,function(d){return d.value;})])
+						.range([d3.min(dataset,function(d){return d.value;}),svgHeight-d3.min(dataset,function(d){return d.value;})]);
+						//.range([0,svgHeight]);
+	//创建SVG元素
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width",svgWidth)
+					.attr("height",svgHeight);
+		svg.selectAll("rect")
+			.data(dataset,key)//绑定数据的参数变化,新数据联结完了
+			.enter()
+			.append("rect")
+	//多值映射写法，将所有的都封装在对象中
+			.attr({
+				//x: function(d,i) {return i * (svgWidth / dataset.length); },
+				x: function(d,i) {return xScale(i); },
+				y: function(d) {return svgHeight - yScale(d.value); },
+				width: xScale.rangeBand(),
+				height: function(d){return yScale(d.value); },
+				fill: function(d) {return "rgb(0,0,"+ (d.value * 10) +")";}
+			});
+	//加标签，把条形图对应的数据加上去
+		svg.selectAll("text")
+			.data(dataset,key)//
+			.enter()
+			.append("text")
+			.text(function(d){
+				return d.value;
+			})
+			.attr({
+				x: function(d,i){
+								return xScale(i) + xScale.rangeBand() / 2;
+							},
+				y: function(d) {return svgHeight - yScale(d.value) + 14; },
+				"font-family": "sans-serif",
+				"font-size": "12px",
+				fill: "white",
+				"text-anchor": "middle"//使数字标签居中
+			});
+
+	//选中"p"元素，并为其添加一个事件监听器
+			d3.select("p")
+				.on("click",function(){
+ 				//先更新数据集，指明要删除
+ 					dataset.shift();
+				//更新比例尺
+					//要往数组中增加(删除)数据,必须对x轴，y轴的比例尺进行更新
+					xScale.domain(d3.range(dataset.length));
+					yScale.domain([0,d3.max(dataset,function(d){return d.value;})]);
+
+				//更新所有矩形，选中删除的元素，将其退出
+						//选择删除值，bars中保存了更新元素集
+						var bars = svg.selectAll("rect")
+									.data(dataset,key);//
+						//退出删除值
+						bars.exit()
+							.transition()
+							.duration(500)
+							.attr("x",-xScale.rangeBand())//使退出的条形图从左边退
+							.remove();//彻底删除
+				//更新条型图的所有属性
+						bars.transition()
+							.duration(500)
+							.attr({
+								x: function(d,i){return xScale(i);},
+								y: function(d){return svgHeight - yScale(d.value);},
+								width: xScale.rangeBand(),
+								height: function(d){return yScale(d.value);}
+							});
+
+				//选择并删除标签
+						var content = svg.selectAll("text")
+											.data(dataset,key);//
+						content.exit()
+								.transition()
+								.duration(500)
+								.attr("x",-xScale.rangeBand() / 2)
+								.remove();
+				//更新所有标签
+						content.transition()
+								.duration(500)
+								.text(function(d){return d.value;})
+								.attr({
+									x: function(d,i){return xScale(i) + xScale.rangeBand() / 2;},
+									y: function(d){return svgHeight - yScale(d.value) + 14;}
+								});		
+
+				});
+	</script>
+</body>
+</html>>
