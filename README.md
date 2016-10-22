@@ -14,3 +14,5 @@ delete data from barchart
 
 #### day-3
 data join
+
+add and delete data
