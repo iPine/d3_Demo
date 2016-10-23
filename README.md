@@ -19,3 +19,5 @@ add and delete data
 
 #### day-4
 interactive chart
+
+tooltips
