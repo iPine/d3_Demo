@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>tooltips</title>
+	<script type="text/javascript" src="../d3/d3.js"></script>
+	<style>
+	/*悬停高亮,最好写在css中*/
+	rect:hover{
+		fill:orange;
+		-moz-transition: all 0.3s;
+		-o-transition: all 0.3s;
+		-webkit-transition: all 0.3s;
+		transition: all 0.3s;
+	}
+	#tooltip {
+		position: absolute;
+		width: 200px;
+		height: auto;
+		padding: 10px;
+		background-color: white;
+		-webkit-border-radius: 10px;
+		-moz-border-radius: 10px;
+		border-radius: 10px;
+		-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+		-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+		box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+		pointer-events: none;
+		}
+	#tooltip.hidden {
+		display: none;
+		}
+	#tooltip p {
+		margin: 0;
+		font-family: sans-serif;
+		font-size: 16px;
+		line-height: 20px;
+		}
+	</style>
+</head>
+<body>
+	<!--提示条的div-->
+	<div id="tooltip" class="hidden">
+			<p><strong>Important Label Heading</strong></p>
+			<p><span id="value">100</span></p>
+	</div>
+	<script type="text/javascript">
+		var svgWidth = 600;
+		var svgHeight = 250;
+		var dataset = [5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+11, 12, 15, 20, 18, 17, 16, 18, 23, 25];
+	//首先创建序数比例尺
+		var xScale = d3.scale.ordinal()
+						//d3.range()是生成连续数值数组的方法
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([0,svgWidth],0.05);	
+		var yScale = d3.scale.linear()
+						.domain([0,d3.max(dataset)])
+						.range([d3.min(dataset,function(d){return d;}),svgHeight-d3.min(dataset,function(d){return d;})]);
+	//创建SVG元素
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width",svgWidth)
+					.attr("height",svgHeight);
+		svg.selectAll("rect")
+			.data(dataset)
+			.enter()
+			.append("rect")
+			.attr({
+				x: function(d,i) {return xScale(i); },
+				y: function(d) {return svgHeight - yScale(d); },
+				width: xScale.rangeBand(),
+				height: function(d){return yScale(d); },
+				fill: function(d) {return "rgb(0,"+ (d * 10) +",0)";}
+			})
+	/*		//1、最简单的浏览器提示条,追加到后面，不能写到中间去
+			.append("title")
+			.text(function(d){
+				return "This value is " + d;
+			})*/
+			//2、SVG元素提示条，方法还是添加事件监听器
+	/*		.on("mouseover",function(d){
+				//取得当前的x位置，并将其转换成浮点值,增大后作为提示条坐标
+				var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.rangeBand() / 2;
+				var yPosition = parseFloat(d3.select(this).attr("y")) + 14;
+				//创建提示条
+				svg.append("text")
+					.attr({
+						id: "tooltip",
+						x: xPosition,
+						y: yPosition,
+						"text-anchor": "middle",
+						"font-family": "sans-serif",
+						"font-size": "11px",
+						"font-weight": "bold",
+						fill: "black"
+					})
+					.text(d);
+
+			})
+			.on("mouseout",function(){
+				//删除提示条
+				d3.select("#tooltip").remove();
+			});*/
+			//3、借助html的div作为提示条
+			.on("mouseover",function(d){
+				var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.rangeBand() / 2;
+				var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + svgHeight / 2;
+				//更新提示条的位置和值
+				d3.select("#tooltip")
+					.style("left",xPosition + "px")
+					.style("top",yPosition + "px")
+					.select("#value")
+					.text(d);
+				//显示提示条
+				d3.select("#tooltip").classed("hidden",false);
+			})
+			.on("mouseout",function(){
+				d3.select("#tooltip").classed("hidden",true);
+			});
+	</script>
+</body>
+</html>>
