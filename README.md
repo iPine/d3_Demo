@@ -16,3 +16,6 @@ delete data from barchart
 data join
 
 add and delete data
+
+#### day-4
+interactive chart
