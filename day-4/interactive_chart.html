@@ -7,7 +7,7 @@
 	<style>
 	/*悬停高亮,最好写在css中*/
 	rect:hover{
-		fill:orange;
+		fill:purple;
 		-moz-transition: all 0.3s;
 		-o-transition: all 0.3s;
 		-webkit-transition: all 0.3s;
@@ -57,7 +57,7 @@
 				width: xScale.rangeBand(),
 			//给高度也写一个比例尺函数，线性的
 				height: function(d){return yScale(d); },
-				fill: function(d) {return "rgb(0,0,"+ (d * 10) +")";}
+				fill: function(d) {return "rgb(" + (d * 10) + ",255,0)";}
 			});
 		/*	//用d3实现悬停高亮
 			.on("mouseover",function(d){
@@ -86,7 +86,7 @@
 				y: function(d) {return svgHeight - yScale(d) + 14; },
 				"font-family": "sans-serif",
 				"font-size": "12px",
-				fill: "white",
+				fill: "red",
 				"text-anchor": "middle"//使数字标签居中
 			})
 			//忽略在文本上的鼠标事件
@@ -120,7 +120,7 @@
 						.attr({
 							height: function(d){return yScale(d);},
 							y: function(d){return svgHeight - yScale(d); },
-							fill: function(d){return "rgb(0,0," + (d * 10) + ")";}
+							fill: function(d){return "rgb(" + (d * 10) + ",255,0)";}
 						})
 				//更新所有标签
 					svg.selectAll("text")
