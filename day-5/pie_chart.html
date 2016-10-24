@@ -1,0 +1,58 @@
+<<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>pie chart</title>
+	<script type="text/javascript" src="../d3/d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var svgHeight = 400;
+		var svgWidth = 400;
+		var dataset = [5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+11, 12, 15, 20, 18, 17, 16, 18, 23, 25];
+		//定义默认饼图布局
+		var pie = d3.layout.pie()
+		//弧形是自定义函数，接受内圆半径和外圆半径作为参数
+		//绘制扇形，需要使用SVG的path元素绘制弧形的内置方法：d3.svg.arc()，帮我们生成路径
+		var innerRadius = 0;
+		var outerRadius = svgWidth / 2;
+		var arc = d3.svg.arc()
+						.innerRadius(innerRadius)
+						.outerRadius(outerRadius);
+		//创建SVG元素
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					});
+		//为每个要绘制的扇形创建新的分组，将生成饼图的数据绑定到新元素，再将扇形平移到图表中心
+		//准备分组
+		var arcs = svg.selectAll("g.arc")
+						.data(pie(dataset))//注意是用新创建的pie()函数，生成饼图数据
+						.enter()
+						.append("g")
+						.attr("class","arc")
+						.attr("transform","translate("+ outerRadius +","+ outerRadius +")");
+		//在每个g元素中都追加一个path元素
+		//绘制弧形路径
+		var color = d3.scale.category20();//生成分类颜色方法
+		arcs.append("path")
+			.attr({
+				fill: function(d,i){return color(i);},
+				d:arc
+			});
+		//最后为每个扇形生成文本标签
+		arcs.append("text")
+			.attr({
+				//centroid是图心，通过计算得到任何图形的中心点
+				transform: function(d){return "translate(" + arc.centroid(d) + ")";},
+				"text-anchor": "middle"
+			})
+			//因为绑定的是饼图数据，所以不能直接引用原始数组中的元素d，而要引用对象数组中的值d.value
+			.text(function(d){return d.value;});
+
+	</script>
+</body>
+</html>
