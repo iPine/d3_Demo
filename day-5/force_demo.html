@@ -1,0 +1,112 @@
+<<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>force directed demo</title>
+	<script type="text/javascript" src="../d3/d3.js"></script>
+
+</head>
+<body>
+	<script type="text/javascript">
+		
+		//力导向布局需要的数据类型都是对象数组形式，分别提供结点和连线
+		var dataset = {
+						nodes: [
+						{ name: "Adam" },
+						{ name: "Bob" },
+						{ name: "Carrie" },
+						{ name: "Donovan" },
+						{ name: "Edward" },
+						{ name: "Felicity" },
+						{ name: "George" },
+						{ name: "Hannah" },
+						{ name: "Iris" },
+						{ name: "Jerry" }
+						],
+						edges: [
+						{ source: 0, target: 1 },
+						{ source: 0, target: 2 },
+						{ source: 0, target: 3 },
+						{ source: 0, target: 4 },
+						{ source: 1, target: 5 },
+						{ source: 2, target: 5 },
+						{ source: 2, target: 5 },
+						{ source: 3, target: 4 },
+						{ source: 5, target: 8 },
+						{ source: 5, target: 9 },
+						{ source: 6, target: 7 },
+						{ source: 7, target: 8 },
+						{ source: 8, target: 9 }
+						]
+						};
+		var svgHeight = 600;
+		var svgWidth = 500;
+		//创建SVG
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					});
+		//初始化力导向布局,指定使用的结点和连线，指定有效空间大小，再调用start()
+		var force = d3.layout.force()
+							.nodes(dataset.nodes)
+							.links(dataset.edges)
+							.size([svgWidth,svgHeight])
+							.linkDistance(100)//增大连线长度
+							.charge(-100);//增大负电荷，使点之间排斥得远些
+		force.start();
+
+		//创建作为连线的SVG直线
+		var edges =svg.selectAll("line")
+						.data(dataset.edges)
+						.enter()
+						.append("line")
+						.style("stroke","#ccc")
+						.style("stroke-width",2);
+		//创建圆作为结点
+		var colors = d3.scale.category20();
+		var nodes = svg.selectAll("circle")
+						.data(dataset.nodes)
+						.enter()
+						.append("circle")
+						//同样，这里也不要写成d.nodes.weight
+						.attr("r",function(d){return d.weight * 5;})
+						.style("fill",function(d,i){
+							return colors(i);
+						})
+						//这个函数的作用是启动拖放交互方式让用户可以拖动结点
+						.call(force.drag);
+		//创建文字说明
+		var text = svg.selectAll("text")
+						.data(dataset.nodes)
+						.enter()
+						.append("text")
+						.style("fill","black")
+						.attr({
+							dx: 20,
+							dy: 8
+						})
+						//这个地方，不要写成d.nodes.name，这样是错的
+						.text(function(d){return d.name;});
+		//最后还必须指定布局打点(tick)是会发生什么
+		//即没打一下，取得直线与圆的新的x/y值，这个值D3回自己计算
+		force.on("tick",function(){
+			edges.attr({
+				"x1": function(d){return d.source.x;},
+				"y1": function(d){return d.source.y;},
+				"x2": function(d){return d.target.x;},
+				"y2": function(d){return d.target.y;}
+			});
+			nodes.attr({
+				cx: function(d){return d.x;},
+				cy: function(d){return d.y;}
+			});
+			text.attr({
+				x: function(d){return d.x;},
+				y: function(d){return d.y;}
+			});
+		});
+	</script>
+</body>
+</html>
