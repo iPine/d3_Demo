@@ -25,3 +25,4 @@ tooltips
 #### day-5
 pie chart
 
+stacked barchart
