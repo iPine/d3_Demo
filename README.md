@@ -8,7 +8,7 @@
 
 #### ScatterDiagram [演示](http://ipine.coding.me/d3-Demo/day-1/ScatterDiagram.html)
 
-#### [演示](http://ipine.coding.me/d3-Demo/day-1/SVG_barchart.html)
+#### SVG barchart [演示](http://ipine.coding.me/d3-Demo/day-1/SVG_barchart.html)
 
 ### day-2
 #### click and dynamic [演示](http://ipine.coding.me/d3-Demo/day-2/barchart_with_scales.html)
