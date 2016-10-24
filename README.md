@@ -17,7 +17,7 @@
 
 #### add data values to barchart [演示](http://ipine.coding.me/d3-Demo/day-2/add_data_to_barchart.html)
 
-####　delete data from barchart [演示](http://ipine.coding.me/d3-Demo/day-2/delete_data_from_barchart.html)
+#### delete data from barchart [演示](http://ipine.coding.me/d3-Demo/day-2/delete_data_from_barchart.html)
 
 ### day-3
 #### data join [演示](http://ipine.coding.me/d3-Demo/day-3/data_join.html)
