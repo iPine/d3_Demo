@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>China map</title>
+	<script type ="text/javascript" src="../d3/d3.js" ></script>
+	<style type="text/css">
+	path:hover{
+		fill:yellow;
+		-moz-transition: all 0.3s;
+		-o-transition: all 0.3s;
+		-webkit-transition: all 0.3s;
+		transition: all 0.3s;
+	}
+	svg text{
+		pointer-events: none;
+	}
+	</style>
+</head>
+<body>
+	<script type ="text/javascript" src="cities-latlng.js"></script>
+	<script type ="text/javascript" >
+
+		var svgHeight = 800;
+		var svgWidth = 800;
+		var dataset1 = [];
+	//	var dataset2 = [];
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					});
+					
+
+		//定义投影,将3D空间投影到2D平面
+		var projection = d3.geo.mercator()
+								.center([100,25])
+								.translate([svgWidth/2,svgHeight/2])
+								.scale(600);
+
+		//首先定义一个路径生成器
+		//并将自定义的投影方式应用起来
+		var path = d3.geo.path()
+						.projection(projection);
+		//添加一个标题
+		svg.append("text")
+    		.text("中国地图")
+    		.attr("x",(svgWidth/2))
+    		.attr("y",50)
+    		.attr("font-size","18px")
+    		.attr("font-weight","bold")
+    		.attr("text-anchor","middle")
+    		.attr("fill","black");
+
+	   
+		//d3.json()加载数据
+		var color = d3.scale.category20();
+		d3.json("china.json",function(error,json){
+		//将GeoJSON的地理特征绑定到新创建的path元素，为每个特征值创建一个path
+			if(error){
+				console.log(error);
+			}
+			else{
+				dataset1 = json;
+			svg.selectAll("path")
+					.data(dataset1.features)
+					.enter()
+					.append("path")
+					.attr({
+						"stroke": "#ccc",
+						"stroke-width": 1,
+						fill: function(d,i){return color(i);}
+					})
+					.attr("d",path);
+				//加城市名
+						svg.selectAll("text")
+							.data(provinces)
+							.enter()
+							.append("text")
+					 		.text(function(d){return d.name;})
+					 		.attr({
+					 			x: function(d){
+					 				console.log(d);
+					 				var local = projection([d.cities[0].g.lng,d.cities[0].g.lat]);
+					 				return local[0];
+					 			},
+					 			y:  function(d){
+					 				var local = projection([d.cities[0].g.lng,d.cities[0].g.lat]);
+					 				return local[1];
+					 			},
+					 			fill: "black",
+					 			"font-family": "sans-serif",
+								"font-size": "12px"
+					 		});
+		 					
+		 	
+		 	svg.append("text")
+		 		.data(citiesLatLng)
+		 		.text(function(d){return d.name;})
+		 		.attr({
+		 			x: function(d){
+		 				var local = projection([d.g.lng,d.g.lat]);
+		 				return local[0];
+		 			},
+		 			y:  function(d){
+		 				var local = projection([d.g.lng,d.g.lat]);
+		 				return local[1];
+		 			},
+		 			fill: "black",
+		 			"font-family": "sans-serif",
+					"font-size": "12px"
+		 		});
+		 		console.log(citiesLatLng[0].name);
+			}		
+		});
+
+		
+		 	
+
+	</script>
+</body>
+</html>
