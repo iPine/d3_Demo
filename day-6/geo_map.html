@@ -74,19 +74,27 @@
 					})
 					.attr("d",path);
 				//加城市名
-						svg.selectAll("text")
+					var provinces_text = svg.selectAll(".ProText")
 							.data(provinces)
 							.enter()
 							.append("text")
+							.attr("class","ProText")
 					 		.text(function(d){return d.name;})
 					 		.attr({
 					 			x: function(d){
 					 				console.log(d);
 					 				var local = projection([d.cities[0].g.lng,d.cities[0].g.lat]);
+					 				if(d.name == "山西" ){return local[0] - 10;}
+					 				if(d.name == "青海" ){return local[0] - 20;}
+					 				if(d.name == "湖南" ){return local[0] - 20;}
+					 				if(d.name == "安徽" ){return local[0] - 10;}
+
 					 				return local[0];
 					 			},
 					 			y:  function(d){
 					 				var local = projection([d.cities[0].g.lng,d.cities[0].g.lat]);
+					 				if(d.name == "浙江" ){return local[1] + 10;}
+
 					 				return local[1];
 					 			},
 					 			fill: "black",
@@ -95,24 +103,29 @@
 					 		});
 		 					
 		 	
-		 	svg.append("text")
-		 		.data(citiesLatLng)
-		 		.text(function(d){return d.name;})
-		 		.attr({
-		 			x: function(d){
-		 				var local = projection([d.g.lng,d.g.lat]);
-		 				return local[0];
-		 			},
-		 			y:  function(d){
-		 				var local = projection([d.g.lng,d.g.lat]);
-		 				return local[1];
-		 			},
-		 			fill: "black",
-		 			"font-family": "sans-serif",
-					"font-size": "12px"
-		 		});
-		 		console.log(citiesLatLng[0].name);
-			}		
+					var cities_text = svg.selectAll(".AfterText")
+						 		.data(citiesLatLng)
+						 		.enter()
+						 		.append("text")
+						 		.attr("class","AfterText")
+						 		.text(function(d){return d.name;})
+						 		.attr({
+						 			x: function(d){
+						 				var local = projection([d.g.lng,d.g.lat]);
+						 				if(d.name == "澳门" ){return local[0] - 20;}
+						 				return local[0];
+						 			},
+						 			y:  function(d){
+						 				var local = projection([d.g.lng,d.g.lat]);
+						 				if(d.name == "天津" ){return local[1] + 10;}
+						 				return local[1];
+						 			},
+						 			fill: "black",
+						 			"font-family": "sans-serif",
+									"font-size": "12px"
+						 		});
+						 		console.log(citiesLatLng[0].name);
+							}		
 		});
 
 		
