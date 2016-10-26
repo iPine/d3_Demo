@@ -37,4 +37,4 @@
 #### force directed demo [演示](http://ipine.coding.me/d3-Demo/day-5/force_demo.html)
 
 ### day-6
-#### geo map [演示](http://ipine.coding.me/d3-Demo/day-6/geo_map.html)
+#### geo map [演示](http://ipine.coding.me/project-folder/d3_Demo/day-6/geo_map.html)
