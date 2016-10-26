@@ -2,39 +2,39 @@
 
 
 ### day-1
-#### index  [演示](http://ipine.coding.me/d3-Demo/day-1/index.html) 
+#### index  [演示](http://ipine.coding.me/d3-Demo/src/day-1/index.html) 
 
-#### proportional scale [演示](http://ipine.coding.me/d3-Demo/day-1/proportional.html)
+#### proportional scale [演示](http://ipine.coding.me/d3-Demo/src/day-1/proportional.html)
 
-#### ScatterDiagram [演示](http://ipine.coding.me/d3-Demo/day-1/ScatterDiagram.html)
+#### ScatterDiagram [演示](http://ipine.coding.me/d3-Demo/src/day-1/ScatterDiagram.html)
 
-#### SVG barchart [演示](http://ipine.coding.me/d3-Demo/day-1/SVG_barchart.html)
+#### SVG barchart [演示](http://ipine.coding.me/d3-Demo/src/day-1/SVG_barchart.html)
 
 ### day-2
-#### click and dynamic [演示](http://ipine.coding.me/d3-Demo/day-2/barchart_with_scales.html)
+#### click and dynamic [演示](http://ipine.coding.me/d3-Demo/src/day-2/barchart_with_scales.html)
 
-#### transition and axes [演示](http://ipine.coding.me/d3-Demo/day-2/axes_scale.html)
+#### transition and axes [演示](http://ipine.coding.me/d3-Demo/src/day-2/axes_scale.html)
 
-#### add data values to barchart [演示](http://ipine.coding.me/d3-Demo/day-2/add_data_to_barchart.html)
+#### add data values to barchart [演示](http://ipine.coding.me/d3-Demo/src/day-2/add_data_to_barchart.html)
 
-#### delete data from barchart [演示](http://ipine.coding.me/d3-Demo/day-2/delete_data_from_barchart.html)
+#### delete data from barchart [演示](http://ipine.coding.me/d3-Demo/src/day-2/delete_data_from_barchart.html)
 
 ### day-3
-#### data join [演示](http://ipine.coding.me/d3-Demo/day-3/data_join.html)
+#### data join [演示](http://ipine.coding.me/d3-Demo/src/day-3/data_join.html)
 
-#### add and delete data [演示](http://ipine.coding.me/d3-Demo/day-3/add_and_delete_data.html)
+#### add and delete data [演示](http://ipine.coding.me/d3-Demo/src/day-3/add_and_delete_data.html)
 
 ### day-4
-#### interactive chart [演示](http://ipine.coding.me/d3-Demo/day-4/interactive_chart.html)
+#### interactive chart [演示](http://ipine.coding.me/d3-Demo/src/day-4/interactive_chart.html)
 
-#### tooltips [演示](http://ipine.coding.me/d3-Demo/day-4/tooltips.html)
+#### tooltips [演示](http://ipine.coding.me/d3-Demo/src/day-4/tooltips.html)
 
 ### day-5
-#### pie chart [演示](http://ipine.coding.me/d3-Demo/day-5/pie_chart.html)
+#### pie chart [演示](http://ipine.coding.me/d3-Demo/src/day-5/pie_chart.html)
 
-#### stacked barchart [演示](http://ipine.coding.me/d3-Demo/day-5/stacked_bar.html)
+#### stacked barchart [演示](http://ipine.coding.me/d3-Demo/src/day-5/stacked_bar.html)
 
-#### force directed demo [演示](http://ipine.coding.me/d3-Demo/day-5/force_demo.html)
+#### force directed demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/force_demo.html)
 
 ### day-6
-#### geo map [演示](http://ipine.coding.me/d3-Demo/day-6/geo_map.html)
+#### geo map [演示](http://ipine.coding.me/d3-Demo/src/day-6/geo_map.html)
