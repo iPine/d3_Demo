@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>sub selection</sub></title>
+	<script type="text/javascript" src="../../../d3/d3.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../css/styles.css"/>
+</head>
+<body>
+		<section id = "section1">
+			<div>
+				<p>blue box</p>
+			</div>
+		</section>
+		<section id = "section2">
+			<div>
+				<p>read box</p>
+			</div>
+		</section>
+	<script type="text/javascript">
+			//通过不同的两种方式选取div元素
+			//1、连接符，大于号表示子连接符，描述了两个元素之间严格的父子关系
+			d3.select("#section1 > div")
+					.attr("class","blue box");
+			//2、类似级联选择方式，好处是可以对父元素进行相应处理，如下
+			d3.select("#section2")
+					.style("font-size","2em")
+					.select("div")
+					.attr("class","red box");	
+	</script>
+</body>
+</html>
