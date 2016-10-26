@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>pie chart</title>
-	<script type="text/javascript" src="../d3/d3.js"></script>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
 </head>
 <body>
 	<script type="text/javascript">
@@ -15,7 +15,7 @@
 		var pie = d3.layout.pie()
 		//弧形是自定义函数，接受内圆半径和外圆半径作为参数
 		//绘制扇形，需要使用SVG的path元素绘制弧形的内置方法：d3.svg.arc()，帮我们生成路径
-		var innerRadius = 0;
+		var innerRadius = 0;//若不为0，则内部就是空心圆
 		var outerRadius = svgWidth / 2;
 		var arc = d3.svg.arc()
 						.innerRadius(innerRadius)

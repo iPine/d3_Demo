@@ -2,14 +2,25 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>My bar chart with scales</title>
-	<script type="text/javascript" src="../d3/d3.js"></script>
-
+	<title>interactive chart</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style>
+	/*悬停高亮,最好写在css中*/
+	rect:hover{
+		fill:purple;
+		-moz-transition: all 0.3s;
+		-o-transition: all 0.3s;
+		-webkit-transition: all 0.3s;
+		transition: all 0.3s;
+	}
+	/*svg text {pointer-events:none;}*/
+	</style>
 </head>
 <body>
 <!--通过事件监听器实现交互
 	响应鼠标事件，任何元素都可以-->
-	<p> Click on this text to update the chart with new data values as many times as you like!</p>
+	<p id = "change"> Click on this text to update the chart with new data values as many times as you like!</p>
+	<p id = "sort"> Click on this text to sort the chart!</p>
 
 	<script type="text/javascript">
 		var svgWidth = 600;
@@ -24,9 +35,8 @@
 						//d3.range()是生成连续数值数组的方法
 						.domain(d3.range(dataset.length))
 						.rangeRoundBands([0,svgWidth],0.05);
-//序数比例尺好处是可以自动分档
-						/*第一个参数表示最小到最大的范围，用这个范围除以值域得到分的档数；第二个参数可指定档间距，为其5%;rangeRoundBands()与rangeBand()的区别在于前者会四舍五入到整数*/
-
+		//序数比例尺好处是可以自动分档
+			
 		var yScale = d3.scale.linear()
 						.domain([0,d3.max(dataset)])
 						.range([d3.min(dataset,function(d){return d;}),svgHeight-d3.min(dataset,function(d){return d;})]);
@@ -40,52 +50,61 @@
 			.data(dataset)
 			.enter()
 			.append("rect")
-	//多值映射写法，将所有的都封装在对象中
 			.attr({
-				//x: function(d,i) {return i * (svgWidth / dataset.length); },
 				x: function(d,i) {return xScale(i); },
 				y: function(d) {return svgHeight - yScale(d); },
 			//有了序数比例尺，可以不用自己计算了，直接调用
 				width: xScale.rangeBand(),
-				//width: svgWidth / dataset.length - barPadding,
 			//给高度也写一个比例尺函数，线性的
-				//height: function(d) {return d * 4; },
 				height: function(d){return yScale(d); },
-				fill: function(d) {return "rgb(0,0,"+ (d * 10) +")";}
+				fill: function(d) {return "rgb(" + (d * 10) + ",255,0)";}
 			});
+		/*	//用d3实现悬停高亮
+			.on("mouseover",function(d){
+				//console.log(d);
+				d3.select(this)
+					.attr("fill","orange");
+			})
+			.on("mouseout",function(d){
+				d3.select(this)
+					.transition()
+					.duration(250)
+					.attr("fill","rgb(0,0,"+ d * 10 +")");
+			});*/
 	//加标签，把条形图对应的数据加上去
 		svg.selectAll("text")
 			.data(dataset)
 			.enter()
 			.append("text")
-			//使用text()方法让每个文本元素都包含一个数据值
 			.text(function(d){
 				return d;
 			})
-			//数据标签出来了，但是有些看不到。因此将数字标签往下移一点
 			.attr({
-				//x: function(d,i){return i * (svgWidth / dataset.length) + (svgWidth / dataset.length - barPadding) / 2;},
 				x: function(d,i){
 								return xScale(i) + xScale.rangeBand() / 2;
 							},
-				//y:function(d) {return svgHeight - d * 4 + 14;},
 				y: function(d) {return svgHeight - yScale(d) + 14; },
-				//位置好了，但是由于字体颜色，还是看不清
 				"font-family": "sans-serif",
 				"font-size": "12px",
-				fill: "white",
+				fill: "red",
 				"text-anchor": "middle"//使数字标签居中
-			});
-	//选中"p"元素，并为其添加一个事件监听器
+			})
+			//忽略在文本上的鼠标事件
+			//也可在CSS中写成 svg text {pointer-events:none;}
+			.style("pointer-events","none");
+	//选中"p"元素，并为其添加事件监听器
 	//select.on()两个参数，事件类型和监听器(匿名函数)
-			d3.select("p")
+			var sortOrder = false;
+			d3.selectAll("p")
 				.on("click",function(){
+					var paragraphId = d3.select(this).attr("id");
+					if(paragraphId == "change"){
 				//先更新数据集
 					var numValues = dataset.length;
-					var updateTimes = 50;
+					var maxValue = 50;
 					dataset = [];
 					for(var i = 0; i < numValues; i++){
-						var newNumber = Math.floor(Math.random() * updateTimes);
+						var newNumber = Math.floor(Math.random() * maxValue);
 						dataset.push(newNumber);
 					}
 				//更新比例尺
@@ -101,7 +120,7 @@
 						.attr({
 							height: function(d){return yScale(d);},
 							y: function(d){return svgHeight - yScale(d); },
-							fill: function(d){return "rgb(0,0," + (d * 10) + ")";}
+							fill: function(d){return "rgb(" + (d * 10) + ",255,0)";}
 						})
 				//更新所有标签
 					svg.selectAll("text")
@@ -120,8 +139,54 @@
 								return svgHeight - yScale(d) + 14;
 							}
 						});
-
+					}else{
+						sortOrder = !sortOrder;
+						var sortBars = function(){
+							svg.selectAll("rect")
+								.sort(function(a,b){
+									if(sortOrder){
+										return d3.ascending(a,b);
+									}else{
+										return d3.descending(a,b);
+									}
+								})
+								.transition()
+								.delay(function(d,i){
+									return i * 50;
+								})
+								.duration(1000)
+								.attr("x",function(d,i){
+									return xScale(i);
+								});
+						};
+						sortBars();
+						var sortText = function(){
+							svg.selectAll("text")
+								.sort(function(a,b){
+									if(sortOrder){
+										return d3.ascending(a,b);
+									}else{
+										return d3.descending(a,b);
+									}								})
+								.transition()
+								.delay(function(d,i){
+									return i * 50;
+								})
+								.duration(1000)
+								.text(function(d){return d;})
+								.attr({
+									x: function(d,i){
+										return xScale(i) + xScale.rangeBand() / 2;
+									},
+									y: function(d){
+										return svgHeight - yScale(d) + 14;
+									}
+								});
+						};
+						sortText();
+					}
 				});
+				
 	</script>
 </body>
 </html>>

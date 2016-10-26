@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>force directed demo</title>
-	<script type="text/javascript" src="../d3/d3.js"></script>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
 
 </head>
 <body>
@@ -90,7 +90,7 @@
 						//这个地方，不要写成d.nodes.name，这样是错的
 						.text(function(d){return d.name;});
 		//最后还必须指定布局打点(tick)是会发生什么
-		//即没打一下，取得直线与圆的新的x/y值，这个值D3回自己计算
+		//即每打一下，取得直线与圆的新的x/y值，这个值D3会自己计算
 		force.on("tick",function(){
 			edges.attr({
 				"x1": function(d){return d.source.x;},

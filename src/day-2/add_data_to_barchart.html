@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Add new data values to my bar chart</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+
+</head>
+<body>
+<!--通过事件监听器实现交互
+	响应鼠标事件，任何元素都可以-->
+	<p> Click on this text to add a new data valie to the chart!</p>
+
+	<script type="text/javascript">
+		var svgWidth = 600;
+		var svgHeight = 250;
+//var barPadding = 1;
+		var dataset = [5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+11, 12, 15, 20, 18, 17, 16, 18, 23, 25];
+
+//之前出来的条形图只是静态的，现在开始学动态
+	//首先创建序数比例尺
+		var xScale = d3.scale.ordinal()
+						//d3.range()是生成连续数值数组的方法
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([0,svgWidth],0.05);
+//序数比例尺好处是可以自动分档
+						/*第一个参数表示最小到最大的范围，用这个范围除以值域得到分的档数；第二个参数可指定档间距，为其5%;rangeRoundBands()与rangeBand()的区别在于前者会四舍五入到整数*/
+
+		var yScale = d3.scale.linear()
+						.domain([0,d3.max(dataset)])
+						.range([d3.min(dataset,function(d){return d;}),svgHeight-d3.min(dataset,function(d){return d;})]);
+						//.range([0,svgHeight]);
+	//创建SVG元素
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width",svgWidth)
+					.attr("height",svgHeight);
+		svg.selectAll("rect")
+			.data(dataset)
+			.enter()
+			.append("rect")
+	//多值映射写法，将所有的都封装在对象中
+			.attr({
+				//x: function(d,i) {return i * (svgWidth / dataset.length); },
+				x: function(d,i) {return xScale(i); },
+				y: function(d) {return svgHeight - yScale(d); },
+			//有了序数比例尺，可以不用自己计算了，直接调用
+				width: xScale.rangeBand(),
+				//width: svgWidth / dataset.length - barPadding,
+			//给高度也写一个比例尺函数，线性的
+				//height: function(d) {return d * 4; },
+				height: function(d){return yScale(d); },
+				fill: function(d) {return "rgb(0,0,"+ (d * 10) +")";}
+			});
+	//加标签，把条形图对应的数据加上去
+		svg.selectAll("text")
+			.data(dataset)
+			.enter()
+			.append("text")
+			//使用text()方法让每个文本元素都包含一个数据值
+			.text(function(d){
+				return d;
+			})
+			//数据标签出来了，但是有些看不到。因此将数字标签往下移一点
+			.attr({
+				//x: function(d,i){return i * (svgWidth / dataset.length) + (svgWidth / dataset.length - barPadding) / 2;},
+				x: function(d,i){
+								return xScale(i) + xScale.rangeBand() / 2;
+							},
+				//y:function(d) {return svgHeight - d * 4 + 14;},
+				y: function(d) {return svgHeight - yScale(d) + 14; },
+				//位置好了，但是由于字体颜色，还是看不清
+				"font-family": "sans-serif",
+				"font-size": "12px",
+				fill: "white",
+				"text-anchor": "middle"//使数字标签居中
+			});
+	//选中"p"元素，并为其添加一个事件监听器
+	//select.on()两个参数，事件类型和监听器(匿名函数)
+			d3.select("p")
+				.on("click",function(){
+				//先更新数据集,每次只增加一个数据
+					var updateTimes = 25;
+					var newNumber = Math.floor(Math.random() * updateTimes);
+					dataset.push(newNumber);
+				//更新比例尺
+					//要往数组中增加数据,必须对x轴的比例尺进行更新
+					xScale.domain(d3.range(dataset.length));
+					yScale.domain([0,d3.max(dataset)]);
+
+				//更新所有矩形，将新增的数据绑定到图形上
+						//选择新增值，bars中保存了更新元素集
+						var bars = svg.selectAll("rect")
+									.data(dataset);
+						//加入新增值
+						bars.enter()
+							.append("rect")
+							.attr({
+								x: svgWidth,//在SVG最右边，一开始不可见，然后有平滑过渡效果
+								y: function(d){return svgHeight - yScale(d); },
+								width: xScale.rangeBand(),
+								height: function(d){return yScale(d);},
+								fill: function(d){return "rgb(0,0,"+ (d * 10) +")";}
+							});
+						//更新新增条型图的所有属性
+						bars.transition()
+							.duration(500)
+							.attr({
+								x: function(d,i){return xScale(i);},
+								y: function(d){return svgHeight - yScale(d);},
+								width: xScale.rangeBand(),
+								height: function(d){return yScale(d);}
+
+							});
+
+
+				//更新所有标签
+					svg.selectAll("text")
+						.data(dataset)
+						.transition()
+						//.delay(function(d,i){
+						//	return i /dataset.length * 1000;})
+						.duration(500)
+						//.ease("elastic")
+						.text(function(d){return d;})
+						.attr({
+							x: function(d,i){
+								return xScale(i) + xScale.rangeBand() / 2;
+							},
+							y: function(d){
+								return svgHeight - yScale(d) + 14;
+							}
+						});
+
+
+						//选择并新加标签
+						var content = svg.selectAll("text")
+											.data(dataset)
+											.enter()
+											.append("text")
+											.attr({
+												x: svgWidth,
+												y: function(d){return svgHeight - yScale(d) + 14;},
+												"font-family": "sans-serif",
+												"font-size": "12px",
+												fill: "white",
+												"text-anchor": "middle"
+											});
+						content.transition()
+								.duration(500)
+								.text(function(d){return d;})
+								.attr({
+									x:function(d,i){return xScale(i) + xScale.rangeBand() / 2;},
+									y:function(d){return svgHeight - yScale(d) + 14;}
+								});
+
+				});
+	</script>
+</body>
+</html>>
