@@ -40,11 +40,11 @@
 #### geo map [演示](http://ipine.coding.me/d3-Demo/src/day-6/geo_map.html)
 
 ### day-7
-#### function chain [演示](http://ipine.coding.me/d3-Demo/src/selection/day-7/function_chain.html)
+#### function chain [演示](http://ipine.coding.me/d3-Demo/src/day-7/selection/function_chain.html)
 
-#### raw selection [演示](http://ipine.coding.me/d3-Demo/src/selection/day-7/raw_selection.html)
+#### raw selection [演示](http://ipine.coding.me/d3-Demo/src/day-7/selection/raw_selection.html)
 
-#### selection iteration [演示](http://ipine.coding.me/d3-Demo/src/selection/day-7/selection_iteration.html)
+#### selection iteration [演示](http://ipine.coding.me/d3-Demo/src/day-7/selection/selection_iteration.html)
 
-#### sub selection [演示](http://ipine.coding.me/d3-Demo/src/selection/day-7/sub_selection.html)
+#### sub selection [演示](http://ipine.coding.me/d3-Demo/src/day-7/selection/sub_selection.html)
 
