@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>array as data</title>
+	<link rel="stylesheet" type="text/css" href="../../../css/styles.css"/>
+    <script type="text/javascript" src="../../../d3/d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		//进入-更新-退出模式
+		var dataset = [25, 39, 12, 15, 21, 19, 27, 77, 56, 83, 47];
+		function render(dataset) {
+			//数据进入(enter)
+			d3.select("body").selectAll("div.h-bar")
+				.data(dataset)
+				.enter()
+				.append("div")
+					.attr("class","h-bar")
+				.append("span");
+
+			//更新(update),为数据和图形有关联的设置属性
+			d3.select("body").selectAll("div.h-bar")
+				.data(dataset)
+				.style("width",function(d){
+					return (d * 5) + "px";
+				})
+				.select("span")
+					.text(function(d){
+						return d;
+					});
+
+			//退出(exit)
+			d3.select("body").selectAll("div.h-bar")
+				.data(dataset)
+				//将没有与数据关联的图形退出并删除
+				.exit()
+					.transition()
+					.duration(500)
+					.remove();
+		}
+
+		setInterval(function(){
+			dataset.shift();//移除数组中第一个元素
+			dataset.push(Math.round(Math.random() * 100 ));//在数组末尾随机产生一个数
+			render(dataset);
+		},1500);//1.5s就会执行一次这种移除增添操作
+
+		//render(dataset);//更新显示
+	</script>
+</body>
+</html>
