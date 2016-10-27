@@ -40,6 +40,7 @@
 #### geo map [演示](http://ipine.coding.me/d3-Demo/src/day-6/geo_map.html)
 
 ### day-7
+### selection
 #### function chain [演示](http://ipine.coding.me/d3-Demo/src/day-7/selection/function_chain.html)
 
 #### raw selection [演示](http://ipine.coding.me/d3-Demo/src/day-7/selection/raw_selection.html)
@@ -48,3 +49,9 @@
 
 #### sub selection [演示](http://ipine.coding.me/d3-Demo/src/day-7/selection/sub_selection.html)
 
+### data
+#### array [演示](http://ipine.coding.me/d3-Demo/src/day-7/data/array.html)
+
+#### object [演示](http://ipine.coding.me/d3-Demo/src/day-7/data/object.html)
+
+#### function [演示](http://ipine.coding.me/d3-Demo/src/day-7/data/function.html)
