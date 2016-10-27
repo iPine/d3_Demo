@@ -55,3 +55,11 @@
 #### object [演示](http://ipine.coding.me/d3-Demo/src/day-7/data/object.html)
 
 #### function [演示](http://ipine.coding.me/d3-Demo/src/day-7/data/function.html)
+
+### handle-data
+#### handle array [演示](http://ipine.coding.me/d3-Demo/src/day-7/handle-data/handle_array.html)
+
+#### data filter [演示](http://ipine.coding.me/d3-Demo/src/day-7/handle-data/data_filter.html)
+
+#### data sort [演示](http://ipine.coding.me/d3-Demo/src/day-7/handle-data/data_sort.html)
+
