@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>data filter</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/styles.css"/>
+    <script type="text/javascript" src="../../../d3/d3.js"></script>
+</head>
+
+<body>
+
+<script type="text/javascript">
+    var dataset = [ 
+        {expense: 10, category: "Retail"},
+        {expense: 15, category: "Gas"},
+        {expense: 30, category: "Retail"},
+        {expense: 50, category: "Dining"},
+        {expense: 80, category: "Gas"},
+        {expense: 65, category: "Retail"},
+        {expense: 55, category: "Gas"},
+        {expense: 30, category: "Dining"},
+        {expense: 20, category: "Retail"},
+        {expense: 10, category: "Dining"},
+        {expense: 8, category: "Gas"}
+    ];
+
+    function render(dataset, category) {
+        d3.select("body").selectAll("div.h-bar")
+                .data(dataset)
+			.enter()
+            .append("div")
+                .attr("class", "h-bar")
+			.append("span");
+
+        d3.select("body").selectAll("div.h-bar")
+                .data(dataset)
+            .exit().remove();
+
+        d3.select("body").selectAll("div.h-bar")
+                .data(dataset)
+            .attr("class", "h-bar")
+            .style("width", function (d) {
+                return (d.expense * 5) + "px";}
+            )
+            .select("span")
+                .text(function (d) {
+                    return d.category;
+                });
+        //过滤数据
+        d3.select("body").selectAll("div.h-bar")
+                //d:表示与当前图形相关联的数据
+                //i:下标，标示当前图形元素
+                //this：代表当前图形的DOM元素
+                .filter(function (d, i) { 
+                    //返回true或者false
+                    return d.category == category;
+                })
+                .classed("selected", true);
+    }
+
+    render(dataset);//实现图形显示
+
+    //选择过滤的实现，接受用户输入，传入参数
+    function select(category) {
+        render(dataset, category);
+    }
+</script>
+
+<div class="control-group">
+    <button onclick="select('Retail')">
+        Retail
+    </button>
+    <button onclick="select('Gas')">
+        Gas
+    </button>
+    <button onclick="select('Dining')">
+        Dining
+    </button>
+    <button onclick="select()">
+        Clear
+    </button>
+</div>
+
+</body>
+
+</html>
