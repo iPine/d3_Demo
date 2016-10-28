@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>axis-barchart-sortGraph</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: black;
+		shape-rendering: crispEdges;
+	}
+	.axis text {
+		font-family: sans-serif;
+		font-size: 11px;
+	}
+	rect:hover{
+		fill:purple;
+		-moz-transition: all 0.3s;
+		-o-transition: all 0.3s;
+		-webkit-transition: all 0.3s;
+		transition: all 0.3s;
+	}
+	svg text{
+		
+		pointer-events: none;
+	}
+	</style>
+</head>
+<body>
+<div >
+    <button id="asc">
+        sort
+    </button>
+</div>
+	<script type="text/javascript">
+		var svgWidth = 500;
+		var svgHeight = 500;
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					});
+
+		var dataset = [];
+		var maxValue = 25;
+		for(var i = 0; i < 10; i++)
+		{
+			var numbers = Math.round(Math.random() * maxValue);
+			dataset.push(numbers);
+		}
+		console.log(dataset);
+		var padding = {left:50, right :100, top: 30, bottom:30};
+
+		var xRangeWidth = svgWidth - padding.left - padding.right;
+		var xScale = d3.scale.ordinal()
+						//d3.range()是生成连续数值数组的方法
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([0,xRangeWidth],0.05);
+
+		var yRangeWidth = svgHeight - padding.top - padding.bottom;
+		var yScale = d3.scale.linear()
+						.domain([0,d3.max(dataset)])
+						.range([yRangeWidth,0]);
+
+		var xAxis = d3.svg.axis()
+						.scale(xScale)
+						.orient("bottom")
+						.ticks(5);
+
+		//yScale.range([yRangeWidth,0]);
+		var yAxis = d3.svg.axis()
+						.scale(yScale)
+						.orient("left")
+						.ticks(5);
+
+	
+
+			svg.selectAll("rect")
+				.data(dataset)
+				.enter()
+				.append("rect")
+				.attr({
+					x: function(d,i){
+						return xScale(i);
+					},
+					y: function(d){
+						var min = yScale.domain()[0];
+						return yScale(min);
+					},
+					width: xScale.rangeBand(),
+					height: function(d){return 0;},
+					transform: "translate("+ padding.left + ","+ padding.top +")",
+					fill: function(d){
+					return "rgb(255,"+ (d * 10) +",20)";}
+				})
+				.transition()
+				.delay(function(d,i){
+				return i * 200;
+				})
+				.duration(2000)
+				.ease("bounce")
+				.attr({
+					y: function(d){return yScale(d);},
+					height: function(d){return yRangeWidth - yScale(d);},
+
+				});
+				
+			svg.selectAll(".bartext")
+				.data(dataset)
+				.enter()
+				.append("text")
+				.attr("class","bartext")
+				.text(function(d){return d;})
+				.attr({
+					x: function(d,i){
+						return xScale(i) + xScale.rangeBand() / 2; 
+					},
+					transform: "translate("+ padding.left + ","+ padding.top +")",
+					"font-family": "sans-serif",
+					"font-size": "12px",
+					"text-anchor": "middle",
+					fill: "balck"
+				})
+				.attr("y",function(d){
+				var min = yScale.domain()[0];
+				return yScale(min);
+				})
+				.transition()
+				.delay(function(d,i){
+					return i * 200;
+				})
+				.duration(2000)
+				.ease("bounce")
+				.attr("y",function(d){
+						return  yScale(d) + 14;
+				});	
+	//	问题：将这两段代码放在创建矩形和创建文本之前，文本不会显示
+		svg.append("g")
+			.attr("class","axis")
+			.attr("transform","translate("+ padding.left + "," + (svgHeight - padding.bottom) + ")")
+			.call(xAxis);
+		svg.append("g")
+			.attr("class","axis")
+			.attr("transform","translate("+ padding.left + ","+ padding.top +")")
+			.call(yAxis);	
+
+		var sortOrder = false;
+		d3.select("button")
+				.on("click",function(){
+				sortOrder = !sortOrder;
+						var sortBars = function(){
+							svg.selectAll("rect")
+								.sort(function(a,b){
+									if(sortOrder){
+										return d3.ascending(a,b);
+									}else{
+										return d3.descending(a,b);
+									}
+								})
+								.transition()
+								.delay(function(d,i){
+									return i * 50;
+								})
+								.duration(1000)
+								.attr("x",function(d,i){
+									return xScale(i);
+								});
+						};
+						sortBars();	
+						var sortText = function(){
+//不能选中所有的text排序，因为会将坐标轴的数值也排乱
+							svg.selectAll(".bartext")
+								.sort(function(a,b){
+									if(sortOrder){
+										return d3.ascending(a,b);
+									}else{
+										return d3.descending(a,b);
+									}								})
+								.transition()
+								.delay(function(d,i){
+									return i * 50;
+								})
+								.duration(1000)
+								.text(function(d){return d;})
+								.attr({
+									x: function(d,i){
+										return xScale(i) + xScale.rangeBand() / 2;
+									},
+									y: function(d){
+										return yScale(d) + 14;
+									}
+								});
+						};
+						sortText();		
+				});
+
+	</script>
+
+</body>
+</html>
