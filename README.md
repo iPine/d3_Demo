@@ -4,7 +4,7 @@
 ### day-1
 #### index  [演示](http://ipine.coding.me/d3-Demo/src/day-1/index.html) 
 
-#### proportional scale [演示](http://ipine.coding.me/d3-Demo/src/day-1/proportional.html)
+#### proportional scale [演示](http://ipine.coding.me/d3-Demo/src/day-1/proportional_scale.html)
 
 #### ScatterDiagram [演示](http://ipine.coding.me/d3-Demo/src/day-1/ScatterDiagram.html)
 
@@ -63,3 +63,9 @@
 
 #### data sort [演示](http://ipine.coding.me/d3-Demo/src/day-7/handle-data/data_sort.html)
 
+### day-8
+#### test1 select [演示](http://ipine.coding.me/d3-Demo/src/day-8/test1-select.html)
+
+#### test2 axisbarchart sortgraph [演示](http://ipine.coding.me/d3-Demo/src/day-8/test2-axisbarchart-sortgraph.html)
+
+#### test3 axisbarchart sortdata [演示](http://ipine.coding.me/d3-Demo/src/day-8/test3-axisbarchart-sortdata.html)
