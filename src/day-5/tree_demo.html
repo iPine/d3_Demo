@@ -1,0 +1,92 @@
+<html>  
+  <head>  
+     <meta charset="utf-8">  
+     <title>tree-demo</title>
+     <script type="text/javascript" src="../../d3/d3.js"></script>
+  
+<style>
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 12px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+</style>
+  </head> 
+<body>
+<script>
+
+var svgWidth = 500,svgHeight = 500;
+//树状图跟集群图几乎一模一样，除了定义布局处稍有不同
+//定义树布局
+var tree = d3.layout.tree()
+    .size([svgWidth, svgHeight - 200])
+    .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2); 
+    });
+//对角线生成器，输入两个顶点坐标，即生成一条贝塞尔曲线
+var diagonal = d3.svg.diagonal()
+//projection()是一个点变换器，默认是[dx,dy],即保存原坐标不变，如下写法是交换x和y坐标
+//目的是让图形横向展示
+    .projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("body")
+            .append("svg")
+            .attr({
+              width: svgWidth,
+              height: svgHeight
+            })
+            .append("g")
+            .attr("transform", "translate(40,0)");
+    
+
+d3.json("city.json", function(error, root) {
+	
+  //获取转换的数据
+  //节点从原始数据获取
+  var nodes = tree.nodes(root);
+  //连接关系线从节点数据里获取
+  var links = tree.links(nodes);
+  
+  console.log(nodes);
+  console.log(links);
+  //绘制连接线路径
+  var link = svg.selectAll(".link")
+      .data(links)
+      .enter()
+      .append("path")
+      .attr("class", "link")
+      .attr("d", diagonal);
+  //绘制节点
+  var node = svg.selectAll(".node")
+      .data(nodes)
+      .enter()
+      .append("g")
+      .attr("class", "node")
+      //一定要平移，不然节点显示不出来
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+  //不能级联写在上面
+  node.append("circle")
+      .attr("r", 4.5);
+  //绘制文本信息
+  node.append("text")
+      .attr("dx", function(d) { return d.children ? -9 : 9; })
+      .attr("dy", 3)
+      //判断文字放在圆圈左边还是右边
+      .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+      .text(function(d) { return d.name; });
+});
+
+</script>
+		
+    </body>  
+</html>  
