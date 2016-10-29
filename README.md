@@ -36,13 +36,13 @@
 
 #### force directed demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/force_demo.html)
 
-#### force directed demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/cluster_demo.html)
+#### cluster demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/cluster_demo.html)
 
-#### force directed demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/tree_demo.html)
+#### tree demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/tree_demo.html)
 
-#### force directed demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/chord_demo.html)
+#### chord demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/chord_demo.html)
 
-#### force directed demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/pack_demo.html)
+#### pack demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/pack_demo.html)
 ### day-6
 #### geo map [演示](http://ipine.coding.me/d3-Demo/src/day-6/geo_map.html)
 
