@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>adjustable China map</title>
+		<script type ="text/javascript" src="../../d3/d3.js" ></script>
+		<style type="text/css">
+		path:hover{
+			fill:yellow;
+			-moz-transition: all 0.3s;
+			-o-transition: all 0.3s;
+			-webkit-transition: all 0.3s;
+			transition: all 0.3s;
+		}
+		.link {
+			stroke: #ccc;
+			stroke-width: 1;
+		}
+		svg text{
+			pointer-events: none;
+		}
+		</style>
+	</head>
+	<body>
+		<script type ="text/javascript" src="cities-latlng.js"></script>
+		<script type ="text/javascript" >
+			var svgHeight = 800;
+			var svgWidth = 800;
+			//	var dataset1 = [];
+			//	var dataset2 = [];
+			var svg = d3.select("body")
+						.append("svg")
+						.attr({
+							width: svgWidth,
+							height: svgHeight
+						});
+						
+			//定义投影,将3D空间投影到2D平面
+			var projection = d3.geo.mercator()
+									.center([100,25])
+									.translate([svgWidth/2,svgHeight/2])
+									.scale(600);
+			//首先定义一个路径生成器
+			//并将自定义的投影方式应用起来
+			var path = d3.geo.path()
+							.projection(projection);
+			//添加一个标题
+			svg.append("text")
+			.text("中国地图")
+			.attr("x",(svgWidth/2))
+			.attr("y",50)
+			.attr("font-size","18px")
+			.attr("font-weight","bold")
+			.attr("text-anchor","middle")
+			.attr("fill","black");
+		//定义力学图布局
+		var force = d3.layout.force()
+							.size([svgWidth,svgHeight]);
+		
+			//d3.json()加载数据
+			var color = d3.scale.category20();
+			d3.json("china (2).json",function(error,json){
+			if (error)
+				return console.error(error);
+			// console.log(json.features);
+			
+			var nodes = [];
+			var links = [];
+			//如何获取力学图的点和连线数据的，很重要
+			json.features.forEach(function(d, i) {
+				//获取每个路径(省)的图心
+				var centroid = path.centroid(d);
+				centroid.x = centroid[0];
+				centroid.y = centroid[1];
+				//其他信息赋给centroid.feature
+				centroid.feature = d;
+				nodes.push(centroid);
+			});
+			
+			//对nodes中的顶点进行三角剖分，即用三角形连接各顶点
+			var triangles = d3.geom.voronoi().triangles(nodes);
+			
+			triangles.forEach(function(d,i){
+				links.push( edge( d[0] , d[1] ) );
+				links.push( edge( d[1] , d[2] ) );
+				links.push( edge( d[2] , d[0] ) );
+			});
+			
+			// console.log(nodes);
+			// console.log(links);
+			//初始化力导向布局
+			force.gravity(0)
+				.charge(0)
+				.nodes(nodes)
+				.links(links)
+				//distance是links里的信息
+				.linkDistance(function(d){ return d.distance; })
+				.start();
+			//加点、绘制路径图
+			var node = svg.selectAll("g")
+							.data(nodes)
+							.enter().append("g")
+							//点移到图心
+							.attr("transform", function(d) { return "translate(" + -d.x + "," + -d.y + ")"; })
+						.call(force.drag)
+						//结合地图路径
+					.append("path")
+					.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+					.attr("stroke","#000")
+					.attr("stroke-width",1)
+					.attr("fill", function(d,i){
+					return color(i);
+					})
+					//没有写成：d:path,因为传的参数是d.feature，不是d
+					.attr("d", function(d){
+						return path(d.feature);
+					} );
+			//创建连线
+			var link = svg.selectAll("line")
+							.data(links)
+							.enter()
+							.append("line")
+							.attr("class","link")
+							.attr("x1",function(d) { return d.source.x; } )
+							.attr("y1",function(d) { return d.source.y; } )
+							.attr("x2",function(d) { return d.target.x; } )
+							.attr("y2",function(d) { return d.target.y; } );
+			//创建文字说明
+			var text = svg.selectAll(".nodeName")
+							.data(nodes)
+							.enter()
+							.append("text")
+							.attr("class","nodeName")
+							.text(function(d){
+								//console.log(d.feature.properties.name);
+								return d.feature.properties.name;
+							});
+			//每次点击更新
+			force.on("tick", function() {
+				link.attr("x1", function(d) { return d.source.x; })
+				.attr("y1", function(d) { return d.source.y; })
+				.attr("x2", function(d) { return d.target.x; })
+				.attr("y2", function(d) { return d.target.y; });
+				node.attr("transform", function(d) {
+				return "translate(" + d.x + "," + d.y + ")";
+				});
+				text.attr({
+								x: function(d){return d.x;},
+								y: function(d){return d.y;}
+							});
+				});
+			
+		});
+			function edge(a, b) {
+			var dx = a[0] - b[0], dy = a[1] - b[1];
+			return {
+				source: a,
+				target: b,
+				distance: Math.sqrt(dx * dx + dy * dy)
+			};
+		}
+		</script>
+	</body>
+</html>
