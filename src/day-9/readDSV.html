@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>read CSV</title>
+	<script type ="text/javascript" src="../../d3/d3.js" ></script>
+
+</head>
+<body>
+	<script type="text/javascript">
+	// d3.csv = d3.dsv(",","text/csv");
+	// d3.tsv = d3.dsv("	","text/tab-separated-values");
+		d3.csv("table.csv",function(error,csvdata){
+		
+			if(error){
+				console.log(error);
+			}
+			console.log(csvdata);
+
+			for(var i = 0; i < csvdata.length; i++){
+				var name = csvdata[i].name;
+				var sex = csvdata[i].sex;
+				var age = csvdata[i].age;
+				console.log( "name: " + name + "\n" +
+							 "sex: " + sex + "\n" +
+							 "age: " + age  );
+			}
+			//将数据转换成字符串
+			var str = d3.csv.format( csvdata );			
+				console.log(str.length);
+				console.log(str);	
+			
+		});
+		//定义以分号分隔的数据文件格式
+		var dsv = d3.dsv(";","text/plain");
+		dsv("table1.dsv",function(error,dsvdata){
+			if(error)
+				console.log(error);
+			console.log(dsvdata);
+		});
+
+		//解决excel创建的.csv文件d3加载乱码问题
+		var csv = d3.dsv(",","text/csv;charset=gb2312");
+		csv("excelT.csv",function(error,csvdata){
+			if(error)
+				console.log(error);
+			console.log(csvdata);
+		});
+	</script>
+</body>
+</html>
