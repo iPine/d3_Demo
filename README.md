@@ -1,7 +1,7 @@
 ## D3-demos
 
-
 ### day-1
+
 #### index  [演示](http://ipine.coding.me/d3-Demo/src/day-1/index.html) 
 
 #### proportional scale [演示](http://ipine.coding.me/d3-Demo/src/day-1/proportional_scale.html)
@@ -76,3 +76,8 @@
 #### test2 axisbarchart sortgraph [演示](http://ipine.coding.me/d3-Demo/src/day-8/test2-axisbarchart-sortgraph.html)
 
 #### test3 axisbarchart sortdata [演示](http://ipine.coding.me/d3-Demo/src/day-8/test3-axisbarchart-sortdata.html)
+
+### day-9
+#### force geo map [演示](http://ipine.coding.me/d3-Demo/src/day-9/force_geo_map.html)
+
+
