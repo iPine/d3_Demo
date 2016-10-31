@@ -18,17 +18,21 @@
 		</style>
 	</head>
 	<body>
+	<svg width="800" height="600" style="border:2px solid blue;"></svg>
 		<script type="text/javascript">
 			var svgHeight = 600;
-			var svgWidth = 600;
+			var svgWidth = 800;
 			var img_H = 120;
 			var img_W = 80;
-			var svg = d3.select("body")
-						.append("svg")
-						.attr({
-							width: svgWidth,
-							height: svgHeight
-						});
+			// var svg = d3.select("body")
+			// 			.append("svg")
+			// 			.attr({
+			// 				width: svgWidth,
+			// 				height: svgHeight,
+			// 				//"stroke": "black",
+			// 				"stroke-width": "1px",
+			// 			});
+			var svg = d3.select("svg");
 			var headline = svg.append("text")
 							.text("人物关系")
 							.attr("x",(svgWidth/2))
@@ -45,7 +49,7 @@
 									.nodes(data.nodes)
 									.links(data.edges)
 									.size([svgWidth,svgHeight])
-									.linkDistance(200)
+									.linkDistance(300)
 									.charge(-1600)
 									.start();
 				console.log(data.nodes);
