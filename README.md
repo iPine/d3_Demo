@@ -85,4 +85,11 @@
 ### day-10
 #### force relation [演示](http://ipine.coding.me/d3-Demo/src/day-10/force_relation.html)
 
+### day-11
+#### custom interpolator 
+
+#### rect partition demo [演示](http://ipine.coding.me/d3-Demo/src/day-11/rect_partition_demo.html)
+
+#### circle partition demo [演示](http://ipine.coding.me/d3-Demo/src/day-11/circle_partition_demo.html)
+
 
