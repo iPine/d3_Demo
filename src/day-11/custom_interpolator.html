@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Custom Interpolator</title>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css"/>
+    <script type="text/javascript" src="../../d3/d3.js"></script>
+</head>
+
+<body>
+<!-- p标签是块级元素，span元素是行内元素。内元素可以写在块级元素里面  比如<p><span>内容</span></p>--> 
+<div id="dollar" class="clear">
+    <span>Custom Dollar Interpolation<br></span>
+</div>
+<div id="alphabet" class="clear">
+    <span>Custom Alphabet Interpolation<br></span>
+</div>
+
+<script type="text/javascript">
+    // 自定义插值函数
+    d3.interpolators.push(function(a, b) { 
+         //a是输出范围的开始值，b是输出范围的结束值
+        // 定义美元符的正则表达式
+      var re = /^\$([0-9,.]+)$/, 
+        ma, mb, f = d3.format(",.02f"); //f为格式化后的返回函数
+        //与正则式匹配则返回一个结果数组，如果不匹配则返回的是null
+      if ((ma = re.exec(a)) && (mb = re.exec(b))) { 
+        //获取与RegExpObject 的第一个子表达式相匹配的文本
+        a = parseFloat(ma[1]);
+        b = parseFloat(mb[1]) - a;  // b变成了结束值与开始值的差值
+        return function(t) {  // t是一个0-1之间的系数
+          return "$" + f(a + b * t); // 计算增量
+        };
+      }
+    });
+    // 自定义插值函数
+    d3.interpolators.push(function(a, b) { 
+      var re = /^([a-z])$/, ma, mb; // 定义小写字母正则表达式
+      if ((ma = re.exec(a)) && (mb = re.exec(b))) {
+        //将a转换为整数值
+        a = a.charCodeAt(0);
+        var delta = a - b.charCodeAt(0); // <-J
+        return function(t) { //  Round是四舍五入。Ceiling是向上取整。float是向下取整
+          return String.fromCharCode(Math.ceil(a - delta * t));
+        };
+      }
+    });
+    //调用并初始化插值函数
+    var dollarScale = d3.scale.linear()
+            .domain([0, 13])
+            .range(["$0", "$300"]); // <-L
+            
+    var alphabetScale = d3.scale.linear()
+            .domain([0, 27])
+            .range(["a", "z"]); // <-M
+        
+    function render(scale, selector) {        
+        var data = [];
+        var max = scale.domain()[1];
+        
+        for (var i = 0; i < max; ++i) data.push(i);      
+        
+        d3.select(selector).selectAll("div.cell")
+                    .data(data)
+                .enter()
+                    .append("div")
+                        .classed("cell", true)
+                    .append("span");
+
+        d3.select(selector).selectAll("div.cell")
+                    .data(data)
+                .exit().remove();
+
+        d3.select(selector).selectAll("div.cell")
+                .data(data)
+                //既拥有了block元素可以设置width和height的特性，又保持了inline元素不换行的特性。
+                .style("display", "inline-block")
+                .select("span")
+                    .text(function(d,i){return scale(d);}); // <-N
+    }
+
+    render(dollarScale, "#dollar");
+    render(alphabetScale, "#alphabet");
+</script>
+
+</body>
+
+</html>

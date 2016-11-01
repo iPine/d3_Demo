@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>rect partition demo</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+		.nodetext{
+			font-family: sans-serif;
+			font-size: 12px;
+			text-anchor: middle;
+		}
+		svg text{
+			pointer-events: none;
+		}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		var svgHeight = 600;
+		var svgWidth = 600;
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					})
+					//最好加一个分组，当遇到要平移的时候，分组就起作用了
+					.append("g");
+		var partition = d3.layout.partition()
+								.sort(null)
+								.size([svgWidth,svgHeight])
+								.value(function(d){
+									//即如果数据文件中用size表示结点大小，则这里就可写成return d.size;
+									return 1;
+								});
+		var color = d3.scale.category20();
+		d3.json("city.json",function(err,root){
+			if(err)
+				console.log(err);
+			console.log(root);
+
+			//获取转换后的数据
+			var nodes = partition.nodes(root);
+			var links = partition.links(nodes);
+
+			console.log(nodes);
+
+			//绑定数据，绘制图形,分一个组是将图形和其对应的文字放在一个组里
+			var rects = svg.selectAll("g")
+							//.data(nodes)
+							//把中国过滤掉，不显示出来
+							.data(nodes.filter(function(d){
+								return d.name == "中国" ? false : true;
+							}))
+							.enter()
+							.append("g");
+
+			//绘制矩形
+			rects.append("rect")
+					.attr({
+						x: function(d){return d.x;},
+						y: function(d){return d.y;},
+						width: function(d){return d.dx;},
+						height: function(d){return d.dy;},
+						transform: "translate(0,-150)"
+					})
+					.style({
+						//若有孩子节点则使孩子节点跟本身颜色一样，若无，则使其颜色与父节点一样
+						//颜色的参数是数值还是字符串不影响，两次传相同的字符串仍返回同一个色
+						fill: function(d){return color((d.children ? d : d.parent).name);}
+					})
+					.style("stroke","#fff")
+					.on("mouseover",function(d){
+						d3.select(this)
+							.style("fill","yellow");
+					})
+					.on("mouseout",function(d){
+						d3.select(this)
+							.transition()
+							.duration(500)
+							.style("fill",function(d){
+								return color((d.children ? d : d.parent).name);
+							});
+					});
+			//绘制文字
+			rects.append("text")
+					.attr("class","nodetext")
+					.attr({
+						x: function(d){return d.x + 20;},
+						y: function(d){return d.y + 20;},
+						transform: "translate(0,-150)"
+					})
+					.text(function(d){
+						return d.name;
+					});
+		})
+	</script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>circle partition demo</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+		.nodetext{
+			font-family: sans-serif;
+			font-size: 12px;
+			text-anchor: middle;
+		}
+
+		svg text{
+			pointer-events: none;
+		}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		var svgHeight = 600;
+		var svgWidth = 600;
+		var radius = Math.min(svgWidth,svgHeight)/3;
+
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					})
+//如果没有在这添加g，就没有作用在svg上，则平移就没有作用，图形还是显示不全
+					.append("g")
+//将整个svg移动到圆形分区图下
+					.attr("transform","translate("+ radius +","+ radius +")");
+		//定义分区布局	
+		var partition = d3.layout.partition()
+								.sort(null)//指定对同深度的节点进行排序的函数
+								.size([2 * Math.PI,radius * radius])
+								.value(function(d){
+									return 1;
+								});
+		//定义弧形生成器
+		var arc = d3.svg.arc()
+						//d.x表示绕圆心方向的起始位置，d.dx表示其长度
+						.startAngle(function(d){return d.x;})
+						.endAngle(function(d){return d.x + d.dx;})
+						//d.y表示由圆心向外方向的起始位置，d.dy表示其宽度
+						.innerRadius(function(d){return Math.sqrt(d.y);})
+						.outerRadius(function(d){return Math.sqrt(d.y + d.dy);});
+		
+
+		var color = d3.scale.category20();
+		d3.json("city.json",function(err,root){
+			if(err)
+				console.log(err);
+			console.log(root);
+			//获取转换后的数据
+			var nodes = partition.nodes(root);
+			var links = partition.links(nodes);
+
+			console.log(nodes);
+
+			//绑定数据，绘制图形
+			var circles = svg.selectAll("g")
+							.data(nodes)
+							.enter()
+							.append("g")
+//或者在绘制分区图前将svg移到“可见区域”
+							//.attr("transform","translate("+ radius +","+ radius +")");
+
+			//绘制弧形路径
+			circles.append("path")
+					.attr("display",function(d){
+						//将最里层隐藏
+						return d.depth ? null: "none";
+					})
+					.attr({
+						d: arc,
+					})
+					.style({
+						"stroke": "#fff",
+						fill: function(d){return color((d.children ? d : d.parent).name);}
+					})
+					.on("mouseover",function(d){
+						d3.select(this)
+							.style("fill","yellow");
+					})
+					.on("mouseout",function(d){
+						d3.select(this)
+							.transition()
+							.duration(500)
+							.style("fill",function(d){
+								return color((d.children? d : d.parent).name);
+							});
+					});
+			//绘制相应文字
+			circles.append("text")
+					.attr("class","nodetext")
+					.attr("transform",function(d,i){
+						//第一个元素即“中国”，平移到中心位置
+						if(i == 0)
+							return "translate("+ arc.centroid(d) +")" + "translate(0,-35)";
+						//其他元素既要平移也要旋转
+						var r = 0;
+						//算在0-180度以内的即右边的，应旋转的度数
+						//其实就是将弧度转为角度数
+						//-90度的原因是：rotate函数是从水平向右开始旋转的，而这个图的第一元素是从垂直向上开始旋转，所以-90度
+						//达到的效果就是，右边的逆转90，左边的顺转90
+						if((d.x+d.dx/2)/Math.PI * 180 < 180)
+							//r = 180 * ((d.x+d.dx/2 ) / Math.PI);
+							r = 180 * ((d.x+d.dx/2 - Math.PI/2 ) / Math.PI);
+						else
+							//r = 180 * ((d.x+d.dx/2 ) / Math.PI);
+							r = 180 * ((d.x+d.dx/2 + Math.PI/2 ) / Math.PI);
+						return "translate("+ arc.centroid(d) +")" + "rotate("+ r +")";
+					})
+					.text(function(d){
+						return d.name;
+					});
+
+		});
+	</script>
+</body>
+</html>
