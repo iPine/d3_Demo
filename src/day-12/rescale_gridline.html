@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>rescaling grid line</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+		.axis path,.axis line{
+			fill:none;
+			stroke: #000;
+			shape-rendering: crispEdges;
+		}
+
+		.axis text{
+			font-family: sans-serif;
+			font-size: 12px;
+		}
+
+		.axis .grid-line{
+			stroke: black;
+			stroke-opacity: 0.2;
+			shape-rendering: crispEdges;
+		}
+	</style>
+</head>
+<body>
+<div>
+	<button onclick="rescale()">Rescale</button>
+</div>
+	<script type="text/javascript">
+		var svgHeight = 500,
+			svgWidth = 500,
+			margin = 25;
+		var xAxis,xAxisLength,yAxis,yAxisLength;
+		//创建svg
+		var svg = d3.select("body")
+					.append("svg")
+					.classed("axis",true)
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					});
+		//创建x轴的函数
+		function renderXAxis(){
+			xAxisLength = svgWidth - 2 * margin;
+
+			var scale = d3.scale.linear().domain([0,100]).range([0,xAxisLength]);
+			//定义x轴
+			xAxis = d3.svg.axis()
+						.scale(scale)
+						.orient("bottom");
+			//先平移再调用
+			 svg.append("g")       
+            .attr("class", "x-axis")
+            .attr("transform", function(){ 
+                return "translate(" + margin + "," + (svgHeight - margin) + ")";
+            })
+            .call(xAxis);
+
+		}
+
+		function renderYAxis(){
+			yAxisLength = svgHeight - 2 * margin;
+
+			var scale = d3.scale.linear().domain([100,0]).range([0,yAxisLength]);
+
+			yAxis = d3.svg.axis()
+						.scale(scale)
+						.orient("left");
+
+			svg.append("g")
+				.attr("class","y-axis")
+				.attr("transform",function(){
+					return "translate("+ margin +","+ margin +")";
+				})
+				.call(yAxis);
+		}
+		//动态调整比例尺的函数
+		function rescale(){
+			//改变比例尺范围
+			var num = Math.round(Math.random() * 100);
+			//改变输入值域，重新调用即更新比例尺
+			//没有改变输出范围的大小，是因为没有改变svg画布的大小
+			xAxis.scale().domain([0,num]);
+			svg.select("g.x-axis")
+				.transition()
+				.call(xAxis);
+
+			yAxis.scale().domain([num,0]);
+			svg.select("g.y-axis")
+				.transition()
+				.call(yAxis);
+
+			//更新网格线
+			renderXGridlines();
+			renderYGridlines();
+
+		}
+		//创建x轴网格线的函数
+		function renderXGridlines(){
+			//先删除旧的
+			var lines = svg.selectAll("g.x-axis g.tick")
+							.select(".grid-line")
+							.remove();
+
+			//再添加
+			lines = svg.selectAll("g.x-axis g.tick")
+						.append("line")
+						.attr("class","grid-line");
+			//最后更新属性
+			lines.attr({
+				x1: 0,
+				y1: 0,
+				x2: 0,
+				y2: - yAxisLength
+			});
+		}
+		//创建y轴网格线的函数
+		function renderYGridlines(){
+			//先删除旧的
+			var lines = svg.selectAll("g.y-axis g.tick")
+							.select(".grid-line")
+							.remove();
+
+			//再添加
+			lines = svg.selectAll("g.y-axis g.tick")
+						.append("line")
+						.attr("class","grid-line");
+			//最后更新属性
+			lines.attr({
+				x1: 0,
+				y1: 0,
+				x2: xAxisLength,
+				y2: 0
+			});
+		}
+
+		//调用创建x,y轴的函数，以及更新x,y轴网格线的函数
+		renderXAxis();
+		renderYAxis();
+		renderXGridlines();
+		renderYGridlines();
+
+	</script>
+</body>
+</html>
