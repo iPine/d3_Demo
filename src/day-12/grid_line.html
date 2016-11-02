@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>grid line</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+	.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+	}
+
+	.axis text {
+	    font: 10px sans-serif;
+	}
+
+	.axis .grid-line{
+	    stroke: black;
+	    shape-rendering: crispEdges;
+	    stroke-opacity: .2;
+	}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+	//不知道刻度值的情况下，如何在坐标轴上绘制网格线
+		var svgHeight = 500,
+			svgWidth = 500,
+			margin = 25;
+
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("class","axis")
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					});
+
+		function renderXAxis(){
+			var axisLength = svgWidth - 2 * margin;
+			var scale = d3.scale.linear()
+								.domain([0,100])
+								.range([0,axisLength]);
+
+			var xAxis = d3.svg.axis()
+							.scale(scale)
+							.orient("bottom");
+			//在分组g下平移
+			svg.append("g")
+				.attr("class","x-axis")
+				.attr("transform",function(){
+					return "translate("+ margin +","+ (svgHeight - margin) +")";
+				})
+				.call(xAxis);
+			//选择分组g下的x坐标轴和刻度线
+			d3.selectAll("g.x-axis g.tick")
+				.append("line")
+					.classed("grid-line",true)
+					//x轴上绘制竖直方向上的网格线
+					.attr({
+						x1: 0,
+						y1: 0,
+						x2: 0,
+					//特别注意y2的值如何得出来的
+					//坐标轴的(0,0)对应svg中的(margin,svgH-margin)
+					//那么svg中的(margin,margin)应对应坐标轴的(margin,2*margin-svgH)
+						//y2: - (svgHeight - 2 * margin)
+						y2: 2 *　margin　- svgHeight
+					});
+		}
+
+		function renderYAxis(){
+			var axisLength = svgHeight - 2 * margin;
+			var scale = d3.scale.linear()
+								.domain([100,0])
+								.range([0,axisLength]);
+			var yAxis = d3.svg.axis()
+							.scale(scale)
+							.orient("left");
+
+			svg.append("g")
+				.attr("class","y-axis")
+				.attr("transform",function(){
+					return "translate("+ margin +","+ margin + ")";
+				})
+				.call(yAxis);
+
+			d3.selectAll("g.y-axis g.tick")
+				.append("line")
+					.classed("grid-line",true)
+					.attr({
+						x1: 0,
+						y1: 0,
+						//x2: axisLength,
+						x2: svgWidth - 2 * margin,
+						y2: 0
+					});
+		}
+
+		renderXAxis();
+		renderYAxis();
+	</script>
+</body>
+</html>
