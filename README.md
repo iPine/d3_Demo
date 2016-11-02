@@ -92,4 +92,14 @@
 
 #### circle partition demo [演示](http://ipine.coding.me/d3-Demo/src/day-11/circle_partition_demo.html)
 
+### day-12
+#### arrows
+
+#### grid line
+
+#### rescale gridline [演示](http://ipine.coding.me/d3-Demo/src/day-12/rescale_gridline.html)
+
+#### histogram demo [演示](http://ipine.coding.me/d3-Demo/src/day-12/histogram_demo.html)
+
+
 
