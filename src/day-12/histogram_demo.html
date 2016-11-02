@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Histogram demo</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+</head>
+<body>
+<div>
+	<button onclick="update()">Update</button>
+</div>
+<script type="text/javascript">
+	var svgHeight = 500,
+		svgWidth = 500;
+	var data = [];
+
+	var svg = d3.select("body")
+				.append("svg")
+				.attr({
+					width: svgWidth,
+					height: svgHeight
+				});
+
+	function newdata(){
+	//随机生成数据,按正态分布随机生成数值,第一个是位置参数，第二个是尺寸参数
+	var rand = d3.random.normal(0,25);
+	var dataset = [];
+	for(var i=0; i<100; i++){
+		dataset.push(rand());
+	}
+	//console.log(dataset);
+	//获取转换后的数据
+	var bins = 15;
+	var histogram = d3.layout.histogram()
+							//区间范围
+							.range([-50,50])
+							//分隔数
+							.bins(bins)
+							//为真,统计个数，为假，统计概率
+							.frequency(true);
+	data = histogram(dataset);
+	console.log(data);
+	}
+
+	function creat(){
+	//绘制之前先定义比例尺，使y在设定范围内延伸
+	var maxHeight = 400;
+	var rectWidth = 30;
+	var heights = [];
+	for(var i=0; i<data.length; i++){
+		heights.push(data[i].y);
+	}
+	var yScale = d3.scale.linear()
+						.domain([0,d3.max(heights)])
+						.range([0,maxHeight]);
+
+	//开始绘制图形
+	var graphics = svg.append("g")
+						.attr("transform","translate(50,30)");
+
+	//绘制矩形
+	graphics.selectAll("rect")
+			.data(data)
+			.enter()
+			.append("rect")
+			.attr({
+				x: function(d,i){return i * rectWidth;},
+				y: function(d){return maxHeight - yScale(d.y);},
+				width: rectWidth - 2,
+				height: function(d){return yScale(d.y);}
+			})
+			.attr("fill",function(d,i){
+				return "rgb("+ (d.y * 10) +",100,0)";
+			});
+	//绘制x轴直线
+	graphics.append("line")
+			.attr({
+				x1: 0,
+				y1: maxHeight,
+				x2: data.length * rectWidth,
+				y2: maxHeight 
+			})
+			.attr({
+				"stroke": "black",
+				"stroke-width": "2px"
+			});
+	//绘制坐标轴上的刻度线
+	graphics.selectAll(".linetick")
+			.data(data)
+			.enter()
+			.append("line")
+			.attr("class","linetick")
+			.attr({
+				x1: function(d,i){
+					return i * rectWidth + rectWidth/2;
+				},
+				y1: maxHeight,
+				x2: function(d,i){
+					return i * rectWidth + rectWidth/2;
+				},
+				y2: maxHeight + 5
+			})
+			.attr({
+				"stroke": "black",
+				"stroke-width": "1px"
+			});
+
+	//绘制刻度线文字
+	graphics.selectAll(".linetext")
+			.data(data)
+			.enter()
+			.append("text")
+			.attr("class","linetext")
+			.attr({
+				x: function(d,i){
+					return i * rectWidth;
+				},
+				y: maxHeight,
+				dx: rectWidth/2 - 10,
+				dy: "15px"
+			})
+			.attr("font-size","10px")
+			.text(function(d){
+				return Math.floor(d.x);
+			});
+	//绘制图形上的文字
+	graphics.selectAll(".recttext")
+			.data(data)
+			.enter()
+			.append("text")
+			.attr("class","recttext")
+			.attr({
+				x: function(d,i){
+					return i * rectWidth;
+				},
+				y: function(d){
+					return maxHeight - yScale(d.y);
+				},
+				dx: rectWidth/2 - 10,
+				dy: "-5px"
+			})
+			.attr("font-size","10px")
+			.text(function(d){
+				if(d.y)
+				return d.y;
+			});
+	}
+	function update(){
+		svg.selectAll("rect")
+			.remove();
+		svg.selectAll("text")
+			.remove();
+		svg.selectAll("line")
+			.remove();
+		newdata();
+		creat();
+	}
+
+	newdata();
+	creat();
+</script>
+</body>
+</html>
