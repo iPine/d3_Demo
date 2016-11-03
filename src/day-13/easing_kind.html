@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>easing kind</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+	.fixed-cell {
+	    min-width: 40px;
+	    min-height: 20px;
+	    margin: 5px;
+	    position: fixed;
+	    text-align: center;
+	    border: #969696 solid thin;
+	    padding: 5px;
+	}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		var data = [
+			"linear", "cubic", "cubic-in-out", "sin", "sin-out",
+			"exp", "circle", "back", "bounce",
+			//自定义函数，二次曲面缓动，t是当前时间值，位于[0,1]
+			function(t){return t * t;}
+		];
+		var color = d3.scale.category10();
+
+		d3.select("body")
+			.selectAll("div")
+			.data(data)
+			.enter()
+			.append("div")
+				.attr("class","fixed-cell")
+				.style("top",function(d,i){
+					return i * 40 + "px";
+				})
+				.style("background-color",function(d,i){
+					return color(i);
+				})
+				.style("left","500px")
+				.text(function(d){
+					//判断是否是自定义的缓动函数
+					if(typeof d == "function")
+						return "custom";
+					return d;
+				});
+		d3.selectAll("div")
+			.each(function(d){
+				d3.select(this)
+					.transition()
+					//传入参数是字符串，D3会找到同名的缓动函数
+					//ease函数不支持这种方式：ease(function(d){return d;})
+					.ease(d)
+					.duration(3000)
+					.style("left","10px");
+			});
+	</script>
+</body>
+</html>
