@@ -36,7 +36,7 @@
 						{ key: 17, value: 18 },
 						{ key: 18, value: 23 },
 						{ key: 19, value: 25 } ];
-		//定义键函数
+		//定义键函数,对象标识函数，方便D3确认，相同id(key)的数据仍然对应同一个"rect",即使它的值value发生了改变
 		var key = function(d) {return d.key;}
 
 		var xScale = d3.scale.ordinal()
