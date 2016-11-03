@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>tweening</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+	.countdown{
+    width: 150px;
+    height: 150px;
+    font-size: 5em;
+    font-weight: bold;
+	}
+	</style>
+</head>
+<body>
+<!-- 1、用d3添加添加按钮，如何添加
+2、中间帧函数的使用，以及初始化自定义中间帧计算函数
+3、多种缓动效果的调用 -->
+	<script type="text/javascript">
+		var body = d3.select("body");
+	//添加第一个按钮，简单过渡
+		body.append("div")
+		//添加button按钮
+			.append("input")
+			.attr("type","button")
+			.attr("class","countdown")
+			.attr("value","0")
+			.style("width","150px")
+			.transition()
+			.duration(5000)
+			.ease("cubic")
+			.style("width","400px")
+			.attr("value","9");
+	//添加第二个按钮，自定义中间帧计算函数
+		body.append("div")
+			.append("input")
+			.attr("type","button")
+			.attr("class","countdown")
+			.attr("value","0")
+			.transition()
+			.duration(5000)
+			.ease("cubic")
+			//中间帧的两个函数
+			.styleTween("width",widthTween)
+			.attrTween("value",valueTween);
+
+	//自定义宽度中间帧计算函数
+	function widthTween(){
+		//调用量化尺度函数，具有离散而非连续区间
+		var interpolate = d3.scale.quantize()
+								.domain([0,1])
+								.range([150,200,250,300,350,400]);
+		return function(t){
+			return interpolate(t) + "px";
+		};
+	}
+	//自定义数值变化中间帧计算函数
+	function valueTween(){
+		var interpolate = d3.scale.quantize()
+								.domain([0,1])
+								.range([1,2,3,4,5,6,7,8,9]);
+		return function(t){
+			return interpolate(t);
+		};
+	}
+	</script>
+</body>
+</html>
