@@ -101,5 +101,14 @@
 
 #### histogram demo [演示](http://ipine.coding.me/d3-Demo/src/day-12/histogram_demo.html)
 
+### day-13
+#### easing
+
+#### tweening
+
+#### drag and zoom [演示](http://ipine.coding.me/d3-Demo/src/day-13/drag_and_zoom.html)
+
+#### drag piechart [演示](http://ipine.coding.me/d3-Demo/src/day-12/drag_piechart.html)
+
 
 
