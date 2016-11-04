@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>text line feed 及封装</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<script type="text/javascript" src="../../d3/multiText.js" charset="utf-8"></script>
+</head>
+<body>
+	<script type="text/javascript">
+//解决文本换行问题
+		var svgWidth = 150;
+		var svgHeight = 600;
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					});
+		var str = "首页,动画192,番剧43,音乐375,舞蹈61,游戏999+,科技255,生活473,鬼畜35,时尚80,广告24,娱乐490,影视";
+
+		 
+		var text = svg.append("text")
+					.attr({
+						x: 30,
+						y: 30,
+						"font-size": "20px",
+						"font-family": "simsun"
+					});
+		//使用JavaScript字符串的split将str以逗号分段
+		var  strs = str.split(",");
+		//传入数据
+		text.selectAll("tspan")
+				.data(strs)
+				.enter()
+				//添加与strs长度相同的tspan元素
+				//在 text 中添加多个 tspan ，每个代表一行。每一个 tspan 属性都赋予一个 1em 值（即一行）
+				.append("tspan")
+				.attr({
+					x: text.attr("x"),
+					//dy 表示 y 轴的相对位移,其值通常用 10px、1em 这样的值，其中 em 是以行为单位的
+					dy: "1em",
+				})
+				.text(function(d){
+					return d;
+				});
+//调用封装好的文本换行文件
+		appendMultiText(svg,str,30,300,120,20);
+	</script>
+</body>
+</html>
