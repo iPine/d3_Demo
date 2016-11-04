@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>data key function</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+</head>
+<body>
+<p></p>
+<p></p>
+<p></p>
+	<script type="text/javascript">
+		var dataset = [{id: 3, name:"张三"},
+						{id: 6, name:"李四"},
+						{id: 9, name: "王五"}];
+		//这样直接使用是不对的
+		// var key = function(d){return d.id;}
+		// d3.select("body")
+		// 	.selectAll("p")
+		// 	.data(dataset,key)
+		// 	.text(function(d){
+		// 		return d.id + ":" + d.name;
+		// 	});
+
+
+		var p =d3.select("body").selectAll("p");
+			p.data(dataset)
+			.text(function(d){
+				return d.id + ":" + d.name;
+			});
+		//只有在选择集原来已经绑定有数据的情况下，才能使用键函数指定绑定的顺序
+		dataset = [{id: 3, name: "王五"},
+					{id: 6, name:"张三"},
+					{id: 9, name:"李四"},
+						];
+			var key = function(d){return d.id}
+			p.data(dataset,key)
+				.text(function(d){
+				return d.id + ":" + d.name;
+			});
+
+	</script>
+</body>
+</html>
