@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>template application</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+		rect:hover{
+		fill:purple;
+		-moz-transition: all 0.3s;
+		-o-transition: all 0.3s;
+		-webkit-transition: all 0.3s;
+		transition: all 0.3s;
+	}
+	svg text {pointer-events:none;}
+	</style>
+</head>
+<body>
+<script type="text/javascript">
+// 	//模板,当数据需要更新(添加、删除、变更)的时候，要想起此模板
+// 	//绑定数据后分别返回update,enter,exit部分
+// 	var update = selection.data(dataset);
+// 	var enter = update.enter();
+// 	var exit = update.exit();
+// //update部分的处理方法是更新属性，enter部分的处理方法是添加元素后再赋予其相应的属性，exit部分的处理方法则是删除掉多余的元素。
+// 	//1、update部分处理方法
+// 	update.text(function(d){return d;});
+
+// 	//2、enter部分处理方法
+// 	enter.append("p")
+// 			.text(function(d){return d;});
+
+// 	//3、exit部分处理方法
+// 	exit.remove();
+
+	var svgWidth = 600;
+	var svgHeight = 300;
+//var barPadding = 1;
+		var dataset = [5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+11, 12, 15, 20, 18, 17, 16, 18, 23, 25];
+
+	//创建SVG元素
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width",svgWidth)
+					.attr("height",svgHeight);
+
+	//绘制图形
+		function draw(){
+			//首先创建序数比例尺
+		var xScale = d3.scale.ordinal()
+						//d3.range()是生成连续数值数组的方法
+						.domain(d3.range(dataset.length))
+						.rangeRoundBands([0,svgWidth],0.05);		
+		var yScale = d3.scale.linear()
+						.domain([0,d3.max(dataset)])
+						.range([d3.min(dataset,function(d){return d;}),svgHeight-d3.min(dataset,function(d){return d;})]);
+
+			//获取矩形的update部分
+			var updateRect = svg.selectAll("rect")
+								.data(dataset);
+			//获取矩形的enter部分
+			var enterRect = updateRect.enter();
+			//获取矩形的exit部分
+			var exitRect = updateRect.exit();
+			//1、矩形的update部分的处理
+			updateRect.attr({
+				x: function(d,i) {return xScale(i); },
+				y: function(d) {return svgHeight - yScale(d); },
+				width: xScale.rangeBand(),
+				height: function(d){return yScale(d); },
+				fill: function(d) {return "rgb(" + (d * 10) + ",255,0)";}
+			});
+			//2、矩形的enter部分的处理
+			enterRect.append("rect")
+					.attr({
+						x: function(d,i) {return xScale(i); },
+						y: function(d) {return svgHeight - yScale(d); },
+						width: xScale.rangeBand(),
+						height: function(d){return yScale(d); },
+						fill: function(d) {return "rgb(" + (d * 10) + ",255,0)";}
+						});
+			//3、矩形的exit部分的处理方法
+			exitRect.remove();
+
+		//文字部分跟矩形一样
+			//获取各个部分
+			var updateText = svg.selectAll("text")
+								.data(dataset);
+			var enterText = updateText.enter();
+			var exitText = updateText.exit();
+			//为各个部分添加处理方法
+			updateText.attr({
+				x: function(d,i){
+								return xScale(i) + xScale.rangeBand() / 2;
+							},
+				y: function(d) {return svgHeight - yScale(d) + 14; },
+				"font-family": "sans-serif",
+				"font-size": "12px",
+				fill: "red",
+				"text-anchor": "middle"
+			})
+			.text(function(d){return d;});
+
+			enterText.append("text")
+					.attr({
+						x: function(d,i){
+								return xScale(i) + xScale.rangeBand() / 2;
+							},
+						y: function(d) {return svgHeight - yScale(d) + 14; },
+						"font-family": "sans-serif",
+						"font-size": "12px",
+						fill: "red",
+						"text-anchor": "middle"
+					})
+					.text(function(d){
+						return d;
+					});
+
+			exitText.remove();
+
+		}
+
+		function mysort(){
+			dataset.sort(d3.ascending);
+			draw();
+		}
+		function myadd(){
+			dataset.push(Math.floor(Math.random() * 100));
+			draw();
+		}
+
+		function mydelete(){
+			dataset.shift();
+			draw();
+		}
+
+		draw();
+</script>
+<br/>
+<button type="button" onclick="mysort()">排序</button>
+<button type="button" onclick="myadd()">增加数据</button>
+<button type="button" onclick="mydelete()">减少数据</button>
+</body>
+</html>
