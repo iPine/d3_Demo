@@ -110,5 +110,14 @@
 
 #### drag piechart [演示](http://ipine.coding.me/d3-Demo/src/day-13/drag_piechart.html)
 
+### day-14
+#### data key
+
+#### text line feed
+
+#### update enter exit [演示](http://ipine.coding.me/d3-Demo/src/day-14/update_enter_exit.html)
+
+#### bundle demo [演示](http://ipine.coding.me/d3-Demo/src/day-14/bundle_demo.html)
+
 
 
