@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>color interpolate</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var svgWidth = 400,
+			svgHight = 400;
+	
+		var svg = d3.select("body").append("svg")
+			.attr("width", svgWidth)
+			.attr("height", svgHight);
+		var a = d3.rgb(0,255,0);
+		var b = d3.rgb(0,0,255);
+
+		var color = d3.interpolate(a,b);
+
+		var linear = d3.scale.linear()
+						.domain([0,150])
+						.range([0,1]);
+		var rects = svg.selectAll("rect")
+						//就是表示0-150
+						.data(d3.range(150))
+						.enter()
+						.append("rect")
+						.attr({
+							x: function(d,i){
+								//每15个换一行,每个宽20
+								return i%15 * 20;
+							},
+							y: function(d,i){
+								//先算出在哪行(向下取整)，再乘以高度
+								return Math.floor(i/15) * 20;
+							},
+							width: 20,
+							height: 20
+						})
+						.style("fill",function(d){
+							//以字符串形式返回
+							return color(linear(d).toString());
+						})
+						.on("mouseover",function(d){
+							d3.select(this)
+								.style("fill-opacity","0.5");
+						})
+						.on("mouseout",function(d){
+							d3.select(this)
+								.style("fill-opacity","1");
+						});
+		//SVG中有线性渐变<linearGradient>和放射性渐变<radialGradient>。
+		//定义线性渐变
+		var defs = svg.append("defs")
+		var linearGradient = defs.append("linearGradient")
+								.attr("id","linearColor")
+							//x1、y1、x2、y2用于定义渐变的方向，此处表示的是水平渐变	
+								.attr({
+									x1: "0%",
+									y1: "0%",
+									x2: "100%",
+									y2: "0%"
+								});
+		//offset定义渐变开始的位置，stop-color定义此位置的颜色。
+		var stop1 = linearGradient.append("stop")
+								.attr("offset","0%")
+								.style("stop-color",a.toString());
+		var stop2 = linearGradient.append("stop")
+								.attr("offset","100%")
+								.style("stop-color",b.toString());
+		//添加一个矩形，并应用线性渐变
+		var colorRect = svg.append("rect")
+							.attr({
+								x: 15,
+								y: 300,
+								width: 200,
+								height: 30
+							})
+							.style("fill","url(#"+ linearGradient.attr("id") +")");
+	</script>
+</body>
+</html>
