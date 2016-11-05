@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>timer</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+	.control-group {
+    padding-top: 10px;
+    margin: 10px;
+	}
+	.countdown{
+    width: 150px;
+    height: 150px;
+    font-size: 5em;
+    font-weight: bold;
+	}
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		var countdown = d3.select("body")
+							.append("div")
+							.append("input");
+			countdown.attr("type","button")
+					.attr("class","countdown")
+					.attr("value",0);
+
+		function countup(target){
+			//d3.timer(function,[delay],[mark])函数接受一个自定义函数，并且立即反复调用这一函数，直到返回true
+			d3.timer(function(){
+				//获取当前的value值
+				var value = countdown.attr("value");
+				//每次加1
+				countdown.attr("value",++value);
+				//加到目标值，就停止
+				if(value == target) return true;
+			});
+		}
+
+		function reset(){
+			//重置值
+			countdown.attr("value",0);
+		}
+	</script>
+	<div class="control-group">
+		<button onclick="countup(100)">count</button>
+		<button onclick="reset()">reset</button>
+	</div>
+</body>
+</html>
