@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>custom interpolate transition</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+	.countdown{
+    width: 150px;
+    height: 150px;
+    font-size: 5em;
+    font-weight: bold;
+	}
+
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		d3.interpolators.push(function(a,b) {
+			var re = /^([a-z])$/, ma, mb;
+			if((ma = re.exec(a))&& (mb = re.exec(b))) {
+				a = a.charCodeAt(0);
+				var delta = a - b.charCodeAt(0);
+				return function(t){
+					return String.fromCharCode(Math.ceil(a - delta * t));
+				};
+			}
+		});
+//一旦注册了自定义插值器，剩下的过渡基本不再需要任何自定义设置，因为d3能够自动选择恰当的插值器
+		var countdown = d3.select("body")
+							.append("div")
+							.append("input");
+			countdown.attr("type","button")
+						.attr("class","countdown")
+						//待插值的值
+						.attr("value","a")
+						.transition()
+						.ease("linear")
+						.duration(4000)
+						.delay(300)
+						.attr("value","z");
+	</script>
+</body>
+</html>
