@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Lines interpolate</title>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css"/>
+    <script type="text/javascript" src="../../d3/d3.js"></script>
+</head>
+
+<body>
+<script type="text/javascript" src="../../d3/axis.js"></script>
+<script type="text/javascript">
+    var svgWidth = 500,
+        svgHeight = 500,
+        margin = 50,
+        xScale = d3.scale.linear() 
+            .domain([0,10])
+            .range([margin, svgWidth - margin]),
+        yScale = d3.scale.linear() 
+            .domain([0,10])
+            .range([svgHeight - margin, margin]);
+        
+    var data = [ 
+        [
+            {x: 0, y: 5},{x: 1, y: 9},{x: 2, y: 7},
+            {x: 3, y: 5},{x: 4, y: 3},{x: 6, y: 4},
+            {x: 7, y: 2},{x: 8, y: 3},{x: 9, y: 2}
+        ],
+        //通过函数生成
+        d3.range(10).map(function(i){
+            return {x: i, y: Math.sin(i) + 5};
+        })
+    ];
+  
+    var svg = d3.select("body").append("svg");
+    
+    svg.attr("height", svgHeight)
+        .attr("width", svgWidth);
+   
+
+//调用创建坐标轴的函数              
+    renderAxes(svg,svgWidth,svgHeight,margin,margin,margin,margin);
+    render("linear");
+    renderDots(svg);
+
+
+    function render(mode){
+    	 //线条生成器
+	    var line = d3.svg.line() 
+	    //允许用户选择线条插值模式
+	    		.interpolate(mode)
+	            .x(function(d){return xScale(d.x);})
+	            .y(function(d){return yScale(d.y);});
+	     //创建路径，传入数据    
+	     svg.selectAll("path.line")
+	            .data(data)
+	        	.enter()
+	            .append("path")
+	            .attr("class", "line");
+	     //有更新的时候，必须写成进入-更新模式，不能省略写在一起
+	     svg.selectAll("path.line")
+	     		.data(data)
+	            //调用路径生成器，传给属性d           
+	            .attr("d", function(d){return line(d);});
+    }
+
+    function renderDots(svg){
+    	data.forEach(function (set){
+    		svg.append("g")
+    			.selectAll("circle")
+    			.data(set)
+    			.enter()
+    			.append("circle")
+    			.attr("class","dot")
+    			.attr({
+    				cx: function(d){return xScale(d.x);},
+    				cy: function(d){return yScale(d.y);},
+    				r: 4.5
+    			});
+    	});
+    }
+   
+</script>
+<h4>Interpolation Mode:</h4>
+<div>
+    <button onclick="render('linear')">linear</button>
+    <button onclick="render('linear-closed')">linear-closed</button>
+    <button onclick="render('step-before')">step-before</button>
+    <button onclick="render('step-after')">step-after</button>
+    <button onclick="render('basis')">basis</button>
+    <button onclick="render('basis-open')">basis-open</button>
+</div>
+<div>
+    <button onclick="render('basis-closed')">basis-closed</button>
+    <button onclick="render('bundle')">bundle</button>
+    <button onclick="render('cardinal')">cardinal</button>
+    <button onclick="render('cardinal-open')">cardinal-open</button>
+    <button onclick="render('cardinal-closed')">cardinal-closed</button>
+    <button onclick="render('monotone')">monotone</button>    
+</div>
+</body>
+
+</html>
