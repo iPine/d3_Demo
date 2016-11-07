@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>本地时间轴</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+	.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+    }
+
+    .axis text {
+        font: 10px sans-serif;
+        fill:black;
+        font-weight:bold;
+    }
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		//简化中文本地化
+		var time = d3.locale({
+		  'decimal': '.',
+		  'thousands': ',',
+		  'grouping': [3],
+		  'currency': ['', ''],
+		  'dateTime': '%a %b %e %X %Y',
+		  'date': '%Y/%-m/%-d',
+		  'time': '%H:%M:%S',
+		  'periods': ['上午', '下午'],
+		  'days': ['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+		  'shortDays': ['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+		  'months': ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+		  'shortMonths': ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+		});
+
+		var svgWidth = 1000,svgHeight = 500;
+		//定义时间比例尺
+		var timeScale = d3.time.scale()
+								.domain([new Date(2016,0,1),new Date(2017,0,1)])
+								.range([0,svgWidth - 100]);
+		//定义时间轴
+		var axis = d3.svg.axis()
+						.scale(timeScale)
+						.tickFormat(time.timeFormat("%Y年%b"))
+						.orient("bottom");
+		//添加时间轴
+		var svg = d3.select("body")
+					.append("svg")
+					.attr({
+						width: svgWidth,
+						height: svgHeight
+					})
+				.append("g")
+					.attr("class","axis")
+					.attr("transform","translate("+ 20 +","+ svgHeight/2 +")")
+					.call(axis);
+		//旋转文字
+		d3.selectAll("g.tick text")
+			.attr("transform","translate(30,20)rotate(30)");
+	</script>
+</body>
+</html>
