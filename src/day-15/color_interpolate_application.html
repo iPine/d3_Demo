@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>颜色插值应用</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		//之前的地图颜色是随机的，现在可用颜色的变化表示值得变化
+		var svgHeight = 800;
+			var svgWidth = 800;
+			//	var dataset1 = [];
+			//	var dataset2 = [];
+			var svg = d3.select("body")
+						.append("svg")
+						.attr({
+							width: svgWidth,
+							height: svgHeight
+						});
+						
+			//定义投影,将3D空间投影到2D平面
+			var projection = d3.geo.mercator()
+									.center([100,25])
+									.translate([svgWidth/2,svgHeight/2])
+									.scale(600);
+			//首先定义一个路径生成器
+			//并将自定义的投影方式应用起来
+			var path = d3.geo.path()
+							.projection(projection);
+			
+
+		//d3.json()加载地图数据
+		var color = d3.scale.category20();
+		d3.json("china (2).json",function(error,json){
+		
+			if(error){
+				console.log(error);
+			}
+			console.log(json);
+			
+			var nodes = [];
+			json.features.forEach(function(d, i) {
+				//获取每个路径(省)的图心
+				var centroid = path.centroid(d);
+				centroid.x = centroid[0];
+				centroid.y = centroid[1];
+				//其他信息赋给centroid.feature
+				centroid.feature = d;
+				nodes.push(centroid);
+			});
+			//添加一个分组包括所有省份
+			var china = svg.append("g");
+			//为每个省份绘制路径
+			var provinces = china.selectAll("path")
+					.data(json.features)
+					.enter()
+					.append("path")
+					.attr("class","province")
+					.attr({
+						"stroke": "#ccc",
+						"stroke-width": 1,
+						fill: "#ccc"
+						// function(d,i){return color(i);}
+					})
+					.attr("d",path);
+			//创建文字说明
+			var text = svg.selectAll("text.nodeName")
+							.data(nodes)
+							.enter()
+							.append("text")
+							.classed("nodename",true)
+							.attr({
+								x: function(d){return d.x;},
+								y: function(d){return d.y;},
+								fill: "black",
+					 			"font-family": "sans-serif",
+								"font-size": "12px"
+							})
+							.text(function(d){
+								//console.log(d.feature.properties.name);
+								return d.feature.properties.name;
+							});
+			//将颜色映射到旅游产业值，加载旅游业数据
+			d3.json("tourism.json",function(err,valuedata){
+				if(err)
+					console.log(err);
+				console.log(valuedata);
+				//将读取到的数据存到数组values，令其索引号为各省名称
+				var values = [];
+				for(var i=0; i<valuedata.provinces.length; i++){
+					var name = valuedata.provinces[i].name;
+					var value = valuedata.provinces[i].value;
+					//各名称对应各值
+					values[name] = value;
+				}
+
+				//求旅游产业的最大值和最小值
+				var maxValue = d3.max(valuedata.provinces,function(d){return d.value;});
+				var minValue = 0;
+				//定义线性比例尺，将最小和最大值之间映射到0-1
+				var linear = d3.scale.linear()
+									.domain([minValue,maxValue])
+									.range([0,1]);
+				//定义最值对应的颜色
+				var a = d3.rgb(255,0,0);
+				var b = d3.rgb(255,255,0);
+				//颜色插值函数
+				var computeColor = d3.interpolate(a,b);
+				//设定各省份的填充色
+				provinces.style("fill",function(d,i){
+					//properties代表的是数字标签[0-length-1]
+					var t = linear(values[d.properties.name]);
+					var color = computeColor(t);
+					return color.toString();
+				});
+				//定义一个线性渐变
+				var defs = svg.append("defs");
+
+				var linearGradient = defs.append("linearGradient")
+										.attr("id","linearColor")
+										.attr({
+											x1: "0%",
+											y1: "0%",
+											x2: "100%",
+											y2: "0%"
+										});
+				var stop1 = linearGradient.append("stop")
+									.attr("offset","0%")
+									.style("stop-color",a.toString());
+				var stop2 = linearGradient.append("stop")
+									.attr("offset","100%")
+									.style("stop-color",b.toString());
+				//添加一个矩形，并应用线性渐变
+				var colorRect = svg.append("rect")
+									.attr({
+										x: 20,
+										y: 500,
+										width: 140,
+										height: 30
+									})
+									.style("fill","url(#"+ linearGradient.attr("id") +")");
+				//添加文字
+					//添加一个标题
+				svg.append("text")
+				.text("旅游产业")
+				.attr("x","90")
+				.attr("y","480")
+				.attr("font-size","18px")
+				.attr("font-weight","bold")
+				.attr("text-anchor","middle")
+				.attr("fill","black");
+				var minValueText = svg.append("text")
+										.attr("class","valueText")
+										.attr({
+											x: 20,
+											y: 500,
+											dy: "-0.3em"
+										})
+										.text(function(){return minValue;});
+				var maxValueText = svg.append("text")
+										.attr("class","valueText")
+										.attr({
+											x: 160,
+											y: 500,
+											dy: "-0.3em"
+										})
+										.text(function(){return maxValue;});
+
+			})
+
+		});			
+	</script>
+</body>
+</html>
