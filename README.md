@@ -126,5 +126,12 @@
 
 #### custom interpolate transition [演示](http://ipine.coding.me/d3-Demo/src/day-15/custom_interpolate_transition.html)
 
+#### color interpolate application [演示](http://ipine.coding.me/d3-Demo/src/day-15/color_interpolate_application.html)
+
+### day-16
+#### line interpolate [演示](http://ipine.coding.me/d3-Demo/src/day-16/line_interpolate.html)
+
+#### line tension [演示](http://ipine.coding.me/d3-Demo/src/day-16/line_tension.html)
+
 
 
