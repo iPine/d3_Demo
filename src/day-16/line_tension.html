@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Line Tension</title>
+   <!--   <link rel="stylesheet" type="text/css" href="../../css/styles.css"/> -->
+    <script type="text/javascript" src="../../d3/d3.js"></script>
+    <style type="text/css">
+    .line{
+    fill: none;    
+    stroke: steelblue;
+    stroke-width: 2;
+    }
+
+    .dot {
+      fill: #fff;
+      stroke: steelblue;
+    }
+    .axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+    }
+
+    .axis text {
+        font: 10px sans-serif;
+    }
+    </style>
+</head>
+
+<body>
+<script type="text/javascript" src="../../d3/axis.js"></script>
+<script type="text/javascript">
+    var svgWidth = 500,
+        svgHeight = 500,
+        margin = 30,
+          
+        xScale = d3.scale.linear()
+            .domain([0, 10])
+            //.range([margin, svgWidth - margin]),
+            .range([margin, svgWidth - margin]),
+        yScale = d3.scale.linear()
+            .domain([0, 1])
+            //.range([svgHeight - margin, margin]);
+            .range([svgHeight - margin, margin]);
+        
+    var data =[
+        d3.range(10).map(function(i){
+            return {x: i, y: (Math.sin(i * 3) + 1) / 2};
+        }),
+
+        d3.range(10).map(function(i){
+            return {x: i, y: (Math.cos(i * 3) + 1) / 2};
+        })
+    ] 
+    
+    var svg = d3.select("body").append("svg");
+    
+    svg.attr("height", svgHeight)
+        .attr("width", svgWidth);
+        
+    renderAxes(svg,svgWidth,svgHeight,margin,margin,margin,margin);
+    //张力值默认为0.7    
+    render([0.7]);   
+    renderDots(svg); 
+    
+    function render(tension){
+        var line = d3.svg.line()
+                .interpolate("cardinal")
+                .x(function(d){return xScale(d.x);})
+                .y(function(d){return yScale(d.y);});
+                
+        svg.selectAll("path.line")
+                .data(data)//
+                .enter()
+                .append("path")
+                .attr("class", "line");            
+                
+        svg.selectAll("path.line")
+            .data(data) //                    
+            .transition()
+            .duration(500).ease("linear")
+            .attr("d", function(d){
+                return line.tension(tension)(d);//注意写法，此处调用数组，并调用line的tension()函数
+               // return line.tension(d)(data);//这种写法，传入的数据是tension，而不是data
+            });
+        //只有一组数据，可直接添加圆圈    
+        // svg.selectAll("circle")
+        //     .data(data)
+        //     .enter()
+        //     .append("circle")
+        //     .attr("class", "dot")
+        //     .attr("cx", function(d) { return xScale(d.x); })
+        //     .attr("cy", function(d) { return yScale(d.y); })
+        //     .attr("r", 4.5);
+    }
+    function renderDots(svg){
+        data.forEach(function (set){
+            svg.append("g")
+                .selectAll("circle")
+                .data(set)
+                .enter()
+                .append("circle")
+                .attr("class","dot")
+                .attr({
+                    cx: function(d){return xScale(d.x);},
+                    cy: function(d){return yScale(d.y);},
+                    r: 4.5
+                });
+        });
+    }
+
+</script>
+
+<h4>Line Tension:</h4>
+<div>
+    <button onclick="render([0])">0</button>
+    <button onclick="render([0.2])">0.2</button>
+    <button onclick="render([0.4])">0.4</button>
+    <button onclick="render([0.6])">0.6</button>
+    <button onclick="render([0.8])">0.8</button>
+    <button onclick="render([1])">1</button>
+</div>
+
+</body>
+
+</html>
