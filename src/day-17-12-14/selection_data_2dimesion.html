@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>二维数组的选择</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+		td{
+			border-right: 3px solid steelblue;
+			border-bottom: 3px solid steelblue;
+			background: #fff;
+			font-size: 32px;
+			color: black;
+		}
+	</style>
+</head>
+<body>
+<script type="text/javascript">
+	//定义一个二维数组
+	var matrix = [
+			  [11975,  5871, 8916, 2868],
+			  [ 1951, 10048, 2060, 6171],
+			  [ 8010, 16145, 8090, 8045],
+			  [ 1013,   990,  940, 6907]
+			];
+	//创建table
+	var tr = d3.select("body").selectAll("tr")
+				.data(matrix)//返回的是每一组，给表格每行传递一个子数组
+				.enter()
+				.append("tr");
+	var td = tr.selectAll("td")
+				.data(function(d){return d;})//返回的是每组中每个值，给每行的每列传递值
+				.enter()
+				.append("td")
+				.text(function(d){return d;});
+</script>
+</body>
+</html>
