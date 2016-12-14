@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>英文字母使用频率条形图</title>
+	<script type="text/javascript" src="../../d3/d3.js"></script>
+	<style type="text/css">
+	.bar{
+		fill:steelblue;
+	}
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: black;
+		shape-rendering: crispEdges;
+	}
+	.axis text {
+		font-family: sans-serif;
+		font-size: 11px;
+	}
+	rect:hover{
+		fill:purple;
+		-moz-transition: all 0.3s;
+		-o-transition: all 0.3s;
+		-webkit-transition: all 0.3s;
+		transition: all 0.3s;
+	}
+	.x.axis path{
+		display: none;
+	}
+	svg text{
+		
+		pointer-events: none;
+	}
+	</style>
+</head>
+<body>
+<h2 style="padding-left: 100px">Relative frequencies of the letters of the English language</h2>
+<script type="text/javascript">
+		var margin = { top: 20, right: 30, bottom: 30, left: 40 },
+		    width = 960 - margin.left - margin.right,
+		    height = 500 - margin.top - margin.bottom;
+		
+		var svg = d3.select('body').append('svg')
+		    .attr('width', width + margin.left + margin.right)
+		    .attr('height', height + margin.top + margin.bottom)
+		  .append('g')
+		    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+		//定义x、y的比例尺
+		var x = d3.scale.ordinal()
+				.rangeRoundBands([0,width],.1);
+
+		var y = d3.scale.linear()
+				.range([height,0]);
+
+		//创建x、y坐标轴
+		var xAxis = d3.svg.axis()
+						.scale(x)
+						.orient("bottom");
+		var yAxis = d3.svg.axis()
+						.scale(y)
+						.orient("left")
+					    .ticks(15,"%");
+
+		//加载数据
+		d3.csv("frequency.csv",type,function(err,data){
+			if(err) throw err;
+			//这里是data.map(),且里面没有数组符号
+			x.domain(data.map(function(d){return d.letter;}));
+			//调用d3.max时要传入数组data
+			y.domain([0,d3.max(data,function(d){return d.frequency;})]);
+	
+
+		//创建bar
+			svg.selectAll("rect")
+				.data(data)
+				.enter()
+				.append("rect")
+				.attr("class","bar")
+				.attr("x",function(d){ return x(d.letter);})
+				.attr("y",function(d){ return y(d.frequency);})
+				.attr("width",x.rangeBand())
+				.attr("height",function(d){ return height - y(d.frequency);});
+		
+		
+		//调用坐标轴
+		svg.append("g")
+			.attr("class","x axis")
+			.attr('transform', 'translate(' + 0 + ',' + height + ')')
+			.call(xAxis);
+
+		svg.append("g")
+			.attr("class","y axis")
+			.call(yAxis)
+		//添加y轴说明
+		.append("text")
+			.attr('transform', 'rotate(-90)')
+			.attr("y",6)
+			.attr("dy",".71em")
+			.style('text-anchor', 'end')
+			.text("Frequency");
+
+		});
+
+		function type(d){
+			d.frequency = +d.frequency;
+			return d;
+		}
+</script>
+</body>
+</html>
