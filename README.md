@@ -133,5 +133,11 @@
 
 #### line tension [演示](http://ipine.coding.me/d3-Demo/src/day-16/line_tension.html)
 
+### day-17-12-14
+#### selection_data_2dimension
+
+####barchart_letters_frequency [演示](http://ipine.coding.me/d3-Demo/src/day-17-12-14/barchart_letters_frequency.html)
+
+####line_letters_frequency [演示](http://ipine.coding.me/d3-Demo/src/day-17-12-14/line_letters_frequency.html)
 
 
