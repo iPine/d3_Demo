@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>英文字母使用频率折线图</title>
+	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>\
+	<script type="text/javascript" src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+	<style type="text/css">
+		.dimple-series-1{
+			fill:red;
+		}
+	</style>
+</head>
+<body>
+<h2 style="padding-left: 140px">Relative frequencies of the letters of the English language</h2>
+<script type="text/javascript">
+	function draw(data){
+		var margin = { top: 20, right: 30, bottom: 30, left: 40 },
+		    width = 960 - margin.left - margin.right,
+		    height = 500 - margin.top - margin.bottom;
+		
+		var svg = d3.select('body').append('svg')
+		    .attr('width', width + margin.left + margin.right)
+		    .attr('height', height + margin.top + margin.bottom)
+		  .append('g')
+		    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+		//dimple.js Chart construction code
+		var myChart = new dimple.chart(svg,data);
+		var x = myChart.addCategoryAxis("x","letter");
+		x.title = null;
+		x.addOrderRule(["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]);
+		// x.hidden = true;
+	    var y = myChart.addMeasureAxis("y","frequency");
+		y.title = "Frequency";
+		y.tickFormat = "%";
+		
+		myChart.addSeries(null,dimple.plot.line);
+		var mySeries = myChart.addSeries(null,dimple.plot.scatter);
+
+		myChart.draw();
+
+
+	}
+	d3.csv("frequency.csv", draw);
+</script>
+</body>
+</html>
