@@ -140,4 +140,7 @@
 
 ####line_letters_frequency [演示](http://ipine.coding.me/d3-Demo/src/day-17-12-14/line_letters_frequency.html)
 
+### day-18-12-17
+#### WorldCup_circles_d3.html [演示](http://ipine.coding.me/d3-Demo/src/day-18-12-17/WorldCup_circles_d3.html) 
+
 
