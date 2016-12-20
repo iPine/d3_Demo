@@ -143,4 +143,7 @@
 ### day-18-12-17
 #### WorldCup_circles_d3.html [演示](http://ipine.coding.me/d3-Demo/src/day-18-12-17/WorldCup_circles_d3.html) 
 
+### day-19-12-20
+#### WorldCup_map.html [演示](http://ipine.coding.me/d3-Demo/src/day-19-12-20/WorldCup_map.html)
+
 
