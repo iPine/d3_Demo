@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style>
+    </style>
+    <script type="text/javascript">  
+      function draw(geo_data) {
+        
+        var margin = 75,
+            width = 1200 - margin,
+            height = 600 - margin;
+
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin)
+            .attr("height", height + margin)
+            .append('g')
+            .attr('transform', 'translate(' + margin + ',' + margin + ')')
+            .attr('class', 'map');
+
+        var projection = d3.geo.mercator()
+        					//看成是放大缩小按钮
+                               .scale(150)
+                            //看成是拖动地图中心
+                               .translate( [width / 2, height / 1.5]);
+//告诉d3使用路径构造器，调用投影机制是什么
+        var path = d3.geo.path().projection(projection);
+
+        var map = svg.selectAll('path')
+        //加载的是还有国家地理位置的数组
+                     .data(geo_data.features)
+                     .enter()
+                     .append('path')
+                     .attr('d', path)
+                     .style('fill', 'lightBlue')
+                     .style('stroke', 'black')
+                     .style('stroke-width', 0.5);
+
+        var format = d3.time.format("%d-%m-%Y (%H:%M h)");
+        //类似于draw这个函数
+        function plot_points(data){
+        	//在地图上绘制圆点，代表参赛人数
+        	//调用d3的嵌套函数，主要包括.key和.rollup两部分
+        	//key部分主要是分组，rollup部分是聚合数据
+        	debugger;
+        	 var nested = d3.nest()
+                           .key(function(d) {
+                              // debugger;//检查d及d.date
+                              return d['date'].getUTCFullYear();
+                           })
+                           //传给rollup的是key函数分组后，每个组的内容的聚合
+                           //通过控制台，查看leaves可以知道
+                           //在这里是每年举办的比赛场数
+                           .rollup(function(leaves) {
+                              // debugger;//检查leaves是什么以及其大小
+                              //获取这一年参加的总人数
+                              var total = d3.sum(leaves,function(d){
+                              	return d.attendance;
+                              });
+                              //获取每场比赛的比赛地点经纬度，使用JS的map函数
+                              //能转换数组的每个元素，再返回一个数组
+                              var coords = leaves.map(function(d){
+                              	//使用projection将经纬度转换为显示像素位置
+                              	return projection([d.long,d.lat]);
+                              });
+                              //计算比赛地点的中心位置，因为同一个比赛，可能会在多个体育场举办
+                              var center_X = d3.mean(coords,function(d){
+                              	return d[0];
+                              });
+                              var center_Y = d3.mean(coords,function(d){
+                              	return d[1];
+                              });
+
+                              return {
+                              	"attendance": total,
+                              	"x": center_X,
+                              	"y": center_Y
+                              };
+                           })
+                           .entries(data);
+                           //可以审查nest函数，看其输出数据是怎么样的
+                           // debugger;
+              //extent函数能够确定最值
+             var attendance_extent = d3.extent(nested,function(d){
+             	return d.values.attendance;
+             });
+             //设置半径比例尺
+             var radius = d3.scale.sqrt()
+             				.domain(attendance_extent)
+             				.range([0,12]);
+             svg.append("g")
+             	.attr("class","bubble")
+             	.selectAll("circle")
+             	.data(nested)
+             	.enter()
+             	.append("circle")
+             	.attr({
+             			cx: function(d){return d.values.x;},
+             			cy: function(d){return d.values.y;},
+             			r: function(d){return radius(d.values.attendance);}
+             		});
+        }
+        //加载有参赛人数的csv文件,控制格式函数，回调函数
+        d3.tsv("world_cup_geo.tsv",function(d){
+        	d.date = format.parse(d.date);
+        	d.attendance = +d.attendance;
+        	return d;
+        },plot_points);
+      };
+      </script>
+  </head>
+<body>
+  <script type="text/javascript">
+  /*
+    Use D3 to load the GeoJSON file
+    */
+    //首先调用d3.json将这个json文件载入到draw函数中，在draw函数中调用d3.tsv函数，将那个tsv文件载入到plot_points函数中
+d3.json("world_countries.json", draw);
+  </script>
+</body>
+</html>
