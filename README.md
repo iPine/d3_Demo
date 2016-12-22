@@ -146,4 +146,7 @@
 ### day-19-12-20
 #### WorldCup_map.html [演示](http://ipine.coding.me/d3-Demo/src/day-19-12-20/WorldCup_map.html)
 
+### day-20-12-22
+#### WorldCup_map_final.html [演示](http://ipine.coding.me/d3-Demo/src/day-20-12-22/WorldCup_map.html)
+
 
