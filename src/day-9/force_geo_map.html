@@ -22,8 +22,8 @@
 		</style>
 	</head>
 	<body>
-		<script type ="text/javascript" src="cities-latlng.js"></script>
-		<script type ="text/javascript" >
+<!-- 		<script type ="text/javascript" src="cities-latlng.js"></script>
+ -->		<script type ="text/javascript" >
 			var svgHeight = 800;
 			var svgWidth = 800;
 			//	var dataset1 = [];
@@ -55,7 +55,8 @@
 			.attr("fill","black");
 		//定义力学图布局
 		var force = d3.layout.force()
-							.size([svgWidth,svgHeight]);
+							.size([svgWidth,svgHeight])
+							.charge(-150);
 		
 			//d3.json()加载数据
 			var color = d3.scale.category20();
@@ -96,13 +97,23 @@
 				//distance是links里的信息
 				.linkDistance(function(d){ return d.distance; })
 				.start();
+			//开始拖动后，固定点
+			var drag = force.drag()
+							.on("dragstart",function(d){
+								force.linkDistance(200);
+								force.linkStrength(1);
+								return fixed = true;
+							})
 			//加点、绘制路径图
 			var node = svg.selectAll("g")
 							.data(nodes)
 							.enter().append("g")
 							//点移到图心
 							.attr("transform", function(d) { return "translate(" + -d.x + "," + -d.y + ")"; })
-						.call(force.drag)
+							.on("dblclick",function(d){
+								return fixed = false;
+							})
+						.call(drag)
 						//结合地图路径
 					.append("path")
 					.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
@@ -126,11 +137,12 @@
 							.attr("x2",function(d) { return d.target.x; } )
 							.attr("y2",function(d) { return d.target.y; } );
 			//创建文字说明
-			var text = svg.selectAll(".nodeName")
+			var text = svg.selectAll("text.nodeName")
 							.data(nodes)
 							.enter()
 							.append("text")
-							.attr("class","nodeName")
+							.classed("nodename",true)
+							//.attr("class","nodeName")
 							.text(function(d){
 								//console.log(d.feature.properties.name);
 								return d.feature.properties.name;

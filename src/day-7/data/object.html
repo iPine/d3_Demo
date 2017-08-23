@@ -28,9 +28,9 @@
 				.append("span");
 
 			//更新(update),为数据和图形有关联的设置属性
-			var color = d3.scale.linear()
+			var color = d3.scale.ordinal()
 								.domain([0,100])
-								.range(["#05FAC0","#000D0A"]);
+								.range(["#1f77b4","#ff7f0e","#2ca02c"]);
 			d3.select("body").selectAll("div.h-bar")
 				.data(dataset)
 				.style("width",function(d){

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Linechart-focus+context</title>
+</head>
+<body>
+	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+	<script type="text/javascript">
+		var width = 960,height = 600;
+		var margin = {top:10, left:50, right: 50, bottom:50, between:50};
+
+		var bottomGraphHeight = 50;
+		var topGraphHeight = height - (margin.top + bottomGraphHeight+margin.between+margin.bottom);
+		var graphWidths = width - margin.left - margin.right;
+
+		var svg = d3.select('body')
+			.append('svg')
+			.attr({
+				width: width,
+				height:height
+			}) 
+			.style('font','10px sans-serif');
+//创建一个剪裁区域，避免focus区域的线在Y轴向左偏离
+		svg.append('defs')
+			.append('clipPath')
+			.attr('id','clip')
+			.append('rect')
+			.attr({
+				width: width,
+				height: height
+			});
+//分别为上：focus，下：context创建一个组
+		var focus = svg.append('g')
+				.attr('transform','translate('+margin.left+','+margin.top+')');
+
+		var context = svg.append('g')
+				.attr('class','context')
+				.attr('transform','translate('+margin.left+','+(height-bottomGraphHeight-margin.bottom)+')');
+//X轴上下两个的比例尺，Y轴上下两个的比例尺
+		var xScaleTop = d3.time.scale().range([0,graphWidths]),
+			xScaleBottom = d3.time.scale().range([0,graphWidths]),
+			yScaleTop = d3.scale.linear().range([topGraphHeight,0]),
+			yScaleBottom = d3.scale.linear().range([bottomGraphHeight,0]);
+//两个相同的x轴
+		var xAxisTop = d3.svg.axis()
+	 				    .scale(xScaleTop).orient('bottom'),
+			xAxisBottom = d3.svg.axis()
+						.scale(xScaleBottom).orient('bottom');
+//一个Y轴	
+		var yAxisTop = d3.svg.axis().scale(yScaleTop).orient('left'); 	
+//定义两个绘制线条的容器
+		var lineTop = d3.svg.line()
+			.x(function(d){return xScaleTop(d.date);})
+			.y(function(d){return yScaleTop(d.close);});
+
+		var lineBottom = d3.svg.line()
+			.x(function(d){return xScaleBottom(d.date);})
+			.y(function(d){return yScaleBottom(d.close);});
+
+		var brush = d3.svg.brush()
+//让下面的context启动brush功能
+			.x(xScaleBottom)
+			.on('brush',function brushed(){
+//判断有无brush，若无，则上面的输入域与下面一样，若有则输入范围为brush范围
+//这里没有效果出来，原因？
+				xScaleTop.domain(brush.empty()?xScaleTop.domain():brush.extent());
+				// xScaleTop.domain(brush.extent());
+				//focus重新调用X轴
+				focus.select('.x.axis').call(xAxisTop);
+//原因在这里，没有重新调用线的绘制
+				focus.selectAll('.line').attr('d',lineTop);
+			});
+//加载数据并初始化视觉元素
+		d3.tsv('https://gist.githubusercontent.com/d3byex/b6b753b6ef178fdb06a2/raw/0c13e82b6b59c3ba195d7f47c33e3fe00cc3f56f/aapl.tsv',function(err,data){
+			data.forEach(function(d){
+				d.date = d3.time.format('%d-%b-%y').parse(d.date);
+				d.close = +d.close;
+			});
+
+			xScaleTop.domain(d3.extent(data,function(d){
+				return d.date;
+			}));
+			yScaleTop.domain(d3.extent(data,function(d){
+				return d.close;
+			}));
+			xScaleBottom.domain(d3.extent(data,function(d){
+				return d.date;
+			}));
+			yScaleBottom.domain(d3.extent(data,function(d){
+				return d.close;
+			}));
+
+			var topXAxisNodes = focus.append('g')
+						.attr('class','x axis')
+						.attr('transform','translate('+0+','+(margin.top+topGraphHeight)+')')
+						.call(xAxisTop);
+			styleAxisNodes(topXAxisNodes,0);
+
+			focus.append('path')
+			//这里用的是datum,而不是data
+			//原因是：使用path时，用datum可以不强制执行进入-更新-退出模式
+					.datum(data)
+					.attr('class','line')
+					.attr('d',lineTop);
+
+			var topYAxisNodes = focus.append('g')
+					.call(yAxisTop);
+			styleAxisNodes(topYAxisNodes);//要将轴主线显示出来，所以第二参数不设
+
+			context.append('path')
+			//这里用的是datum,而不是data
+					.datum(data)
+					.attr('class','line')
+					.attr('d',lineBottom);
+
+			var bottomXAxisNodes = context.append('g')
+				.attr('transform','translate('+0+','+bottomGraphHeight+')')
+				.call(xAxisBottom);
+			styleAxisNodes(bottomXAxisNodes,0);
+
+			context.append('g')
+				.attr('class','x brush')
+				.call(brush)
+				.selectAll('rect')
+				.attr('y',-6)
+				.attr('height',bottomGraphHeight + 7);
+//这里什么意思？
+			context.selectAll('.extent')
+					.attr({
+						stroke: '#000',
+						'fill-opacity': 0.125,
+						'shape-rendering': 'crispEdges'
+					});
+
+			styleLines(svg);
+
+		});
+
+		function styleLines(svg){
+			svg.selectAll('path.line')
+				.attr({
+					fill: 'none',
+					'stroke-width': 1.5,
+					stroke: 'steelblue',
+				//将前面定义的剪裁区引用到这里,避免brush时，线跑到轴外面
+					'clip-path': 'url(#clip)'
+				});
+		}
+
+		function styleAxisNodes(axisNodes,strokeWidth){
+			axisNodes.selectAll('.domain')
+				.attr({
+					fill: 'none',
+					'stroke-width': strokeWidth,
+					stroke:'black'
+				});
+			axisNodes.selectAll('.tick line')
+				.attr({
+					fill: 'none',
+                    'stroke-width': 1,
+                    stroke: 'black'
+				})
+
+		}
+	</script>
+</body>
+</html>

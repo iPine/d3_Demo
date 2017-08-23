@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>simple</title>
+</head>
+<body>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+	var url = 'https://gist.githubusercontent.com/d3byex/5a8267f90a0d215fcb3e/raw/b53d20a8a6a82fd8bab2c03e0ec5a96262b5c8da/uni_network.json';
+	d3.json(url, function (error, data) {
+            var width = 960, height = 500;
+
+            var svg = d3.select('body').append('svg')
+                .attr({
+                    width: width,
+                    height: height
+                });
+
+            var force = d3.layout.force()
+                .nodes(data.nodes)
+                .links(data.edges)
+                .size([width, height])//
+                .linkDistance(1)
+                .charge(-5000)
+                .start();
+
+            var edges = svg.selectAll('line')
+                .data(data.edges)
+                .enter()
+                .append('line')
+                .style('stroke', '#ccc')
+                .style('stroke-width', 1)
+                .attr({
+                    'pointer-events': 'none',
+                    'font': '10px sans-serif'
+                });
+
+            var colors = d3.scale.category20();
+    //将节点和文本放在一个组里
+            var nodes = svg.selectAll('g')
+                .data(data.nodes)
+                .enter()
+                .append('g')
+            //若不要的话，拖动节点会产生叠影
+                .call(force.drag);
+
+            nodes.append('circle')
+                .attr('r', 10)
+                .attr('fill', function (d, i) {
+                    return colors(i);
+                })
+                .call(force.drag);
+            nodes.append('text')
+                .attr({
+                    dx:12,
+                    dy: '.35em',
+                    'pointer-events': 'none'
+                })
+                .style('font','10px sans-serif')
+                .text(function(d){return d.name;});
+
+            force.on('tick', function () {
+                //也可这样写：
+                // edges.each(function(d){
+                //     d3.select(this)
+                //         .attr({
+                //             x1: d.source.x,
+                //             y1: d.source.y,
+                //             x2: d.target.x,
+                //             y2: d.target.y
+                //         });
+                // });
+                edges.attr({
+                    x1: function (d) { return d.source.x; },
+                    y1: function (d) { return d.source.y; },
+                    x2: function (d) { return d.target.x; },
+                    y2: function (d) { return d.target.y; }
+                });
+                //不直接设置圆的dx和dy了，而是将组移动到正确位置
+                nodes.attr('transform', function(d){ return 'translate('+d.x+','+d.y+')'; });
+            });
+        });
+</script>
+</body>
+</html>

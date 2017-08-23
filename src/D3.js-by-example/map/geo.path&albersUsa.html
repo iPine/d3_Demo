@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>USA Map</title>
+</head>
+<body>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script>
+        var width = 475, height = 250;
+        var svg = d3.select('body')
+            .append('svg')
+            .attr({
+                width: width,
+                height: height
+            });
+
+        var url = 'https://gist.githubusercontent.com/d3byex/65a128a9a499f7f0b37d/raw/176771c2f08dbd3431009ae27bef9b2f2fb56e36/us-states.json';
+        d3.json(url, function (error, data) {
+    //没指定投影方式时用的是albersUsa默认设置长宽分别为1024、728,；图中心为长宽的一半；
+    //d3.geo.path()
+            var projection = d3.geo.albersUsa()
+                .translate([width / 2, height / 2])
+                //只需指定宽度就型，高会按比例自动缩放
+                .scale([width]);
+
+            var path = d3.geo.path()
+    .projection(projection);
+
+            svg.selectAll('path')
+                .data(data.features)
+                .enter()
+                .append('path')
+                .attr('d', path)
+                .style({ fill: 'none', stroke: 'black' });
+        });
+    </script>
+</body>
+</html>

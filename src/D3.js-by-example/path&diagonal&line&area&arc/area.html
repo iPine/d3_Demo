@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>area</title>
+</head>
+<body>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+	var svg = d3.select('body')
+				.append('svg')
+				.attr({
+					width:500,
+					height: 250
+				});
+//主要学习这里的写法，产生100个0-30之间的数
+	var data = d3.range(100)
+				.map(function(i){
+					return Math.random() *30;
+				})
+				.map(function(d,i){
+					return {
+						X: i*10,
+						Y: d
+					}
+				});
+//注意路径生成器的三个基本参数
+	var generator = d3.svg.area()
+					.y0(100)
+					.x(function(d){return d.X;})
+					.y1(function(d){return d.Y;});
+
+	svg.append('path')
+//path路径用datum
+		.datum(data)
+		.attr({
+			d: generator,
+			fill: 'yellow',
+			stroke: 'black'
+		});
+</script>
+</body>
+</html>

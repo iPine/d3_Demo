@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>tree</title>
+</head>
+<body>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+	var url = 'https://gist.githubusercontent.com/d3byex/25129228aa50c30ef01f/raw/c1c3ad9fa745c42c5410fba29cefccac47cd0ec7/familytree.json';
+	d3.json(url,function(err,data){
+		var width = 960,height = 500,
+			nodeRadius = 10,
+			margin = {left:50, top: 10, bottom: 10, right:40};
+
+		var svg = d3.select('body')
+                .append('svg')
+                .attr({
+                    width: width,
+                    height: height
+                });
+
+        var mainGroup = svg.append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+//为层级数据创建树形结构，生成器
+        var tree = d3.layout.tree()
+  //指定大小，且先指定高度，再是宽度
+        		.size([
+                    height - (margin.bottom + margin.top),
+                    width - (margin.left + margin.right),
+                ]);
+//创造节点和连线数据
+        var nodes = tree.nodes(data);
+        var links = tree.links(nodes);
+//使用斜线生成器创建斜线，并用projection函数告诉生成器如何找到Y和X的值
+        var diagonal = d3.svg.diagonal()
+        		.projection(function(d){
+        			return [d.y, d.x];
+        		});
+//先绘制线，再绘制节点。这样节点就在线前面
+        mainGroup.selectAll('path')
+        		.data(links)
+        		.enter()
+      //同时添加两个，将所有斜线放在一个组里
+        		.append('path','g')
+        		.attr({
+        			d: diagonal,
+        			fill: 'none',
+        			stroke: '#ccc',
+        			"stroke-width": 3
+        		});
+        var circleGroups = mainGroup.selectAll('g')
+        			.data(nodes)
+        			.enter()
+        			.append('g')
+        			.attr('transform',function(d){
+        		//横放的，所以y在前
+        				return 'translate('+d.y+','+d.x+')';
+        			});
+        	circleGroups.append('circle')
+        				.attr({
+        					r: nodeRadius,
+        					fill: '#fff',
+		                    stroke: 'steelblue',
+		                    'stroke-width': 3
+        				});
+        var circleText = circleGroups.append('text')
+        				.text(function(d){return d.name;})
+        				.attr({
+        //判断有无孩子节点，若无，则写在圆下；若有，则写在圆上
+        					y: function(d){
+        						return d.children || d._children ? -nodeRadius*2 : nodeRadius *2;
+        					},
+        					dy: '.35em',
+		                    'text-anchor': 'middle',
+		                    'fill-opacity': 1
+        				})
+        				.style('font','12px sans_serif');
+
+	});
+</script>
+</body>
+</html>

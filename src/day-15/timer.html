@@ -31,7 +31,7 @@
 			d3.timer(function(){
 				//获取当前的value值
 				var value = countdown.attr("value");
-				//每次加1
+				//每次加1,"++"必须在前
 				countdown.attr("value",++value);
 				//加到目标值，就停止
 				if(value == target) return true;

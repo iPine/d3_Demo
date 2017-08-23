@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>simple</title>
+</head>
+<body>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+	var url = 'https://gist.githubusercontent.com/d3byex/5a8267f90a0d215fcb3e/raw/b53d20a8a6a82fd8bab2c03e0ec5a96262b5c8da/uni_network.json';
+	d3.json(url, function (error, data) {
+            var width = 960, height = 500;
+
+            var svg = d3.select('body').append('svg')
+                .attr({
+                    width: width,
+                    height: height
+                });
+//很多种方式，基本的一种。调用了start()并不会马上执行，仍可以设置视觉元素
+//charge的默认值是-30，不足以使节点远离重力中心
+            var force = d3.layout.force()
+                .nodes(data.nodes)
+                .links(data.edges)
+                .size([width, height])//图大小、引力中心、初始随机位置
+        //1、linkDistance默认值是20。2、增大值到200使节点分得更开
+        //3、linkDistance为1，charge为-5000。使节点远离重力中心同时节点间连线不会交叉
+        //连线距离较小，因为排斥会使节点分开很多，因此拉长连线。
+        //若还为200，会使连线很长
+                .linkDistance(1)
+                .charge(-5000)
+                .start();
+
+            var edges = svg.selectAll('line')
+                .data(data.edges)
+                .enter()
+                .append('line')
+                .style('stroke', '#ccc')
+                .style('stroke-width', 1);
+
+            var colors = d3.scale.category20();
+            var nodes = svg
+                .selectAll('circle')
+                .data(data.nodes)
+                .enter()
+                .append('circle')
+                .attr('r', 10)
+                .attr('fill', function (d, i) {
+                    return colors(i);
+                })
+                .call(force.drag);
+
+            force.on('tick', function () {
+                edges.attr({
+                    x1: function (d) { return d.source.x; },
+                    y1: function (d) { return d.source.y; },
+                    x2: function (d) { return d.target.x; },
+                    y2: function (d) { return d.target.y; }
+                });
+
+                nodes.attr('cx', function (d) { return d.x; })
+                     .attr('cy', function (d) { return d.y; });
+            });
+        });
+</script>
+</body>
+</html>

@@ -66,8 +66,7 @@
             if(i !== 1942 && i !== 1946)
               years.push(i);
           }
-//产生主办国家数组
-        // var host_country = ['Italy',]
+
 
         var projection = d3.geo.mercator()
         //看成是放大缩小按钮
@@ -114,8 +113,8 @@
                 var center_y = d3.mean(coords, function(d) {
                     return d[1];
                 });
-
-                var host_country = d3.set();
+              //获取主办国家数组
+                var host_country = d3.set();//先清空，保证不重复放入
                 leaves.forEach(function(d){
                     host_country.add(d.home);
                 });
@@ -259,7 +258,7 @@
           //debugger;
           // update(1930);
  
-//循环更新每年
+//循环更新每年，调用update
 //setInterval函数每隔1s调用一次前面的匿名函数
           var year_idx = 0;
 

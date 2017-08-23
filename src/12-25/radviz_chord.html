@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>radviz_chord</title>
+	<script type="text/javascript" src="lib/d3.min.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+var cNum = 9;
+
+function draw(data){
+
+	maxLabel(data);
+
+
+	console.log(data);
+	var margin = 30,
+		width = 960,
+		height = 600,
+	    innerRadius = 205,
+	    outerRadius = 220;
+
+	
+	
+	var svg = d3.select('body').append('svg')
+	    .attr('width', width)
+	    .attr('height', height);
+	  
+
+	var pie = d3.layout.pie().sort(null);
+
+
+	var arc = d3.svg.arc()
+				.innerRadius(innerRadius)
+				.outerRadius(outerRadius);
+				// .startAngle()
+				// .endAngle();
+
+	
+
+	var arcs = svg.selectAll('g.arc')
+                .data(pie(dimData(cNum)))
+                .enter()
+                .append('g')
+                .attr('class', 'arc')
+                .attr("transform","translate("+ width/2 +","+ height/2 +")")
+                .attr('id', function(d, i) {
+                    return 'arc' + i;
+                });
+
+    console.log(pie(dimData(cNum)));
+          
+    var arcsObj = arcs.append("path")
+                .attr("fill", function(d, i) {
+                    return anchorColor(i);
+                })
+                .attr('fill-opacity', 1)
+                .attr("d", function(d){
+                	return arc(d);
+                })
+    
+
+    arcs.append("circle")
+			.attr({
+				r: 6,
+				transform: function(d){return "translate(" + arc.centroid(d) + ")";},	
+			})
+			
+}
+
+	
+		
+	function dimensions_name(cNum){
+		var dimensions = [];
+		for(var i=0; i<cNum; i++){
+			dimensions.push("C" + (i+1));
+		}
+		return dimensions;
+	}
+
+	function anchorColor(i){
+		var colorList = ['#FF8c8c', '#de3669', '#52b5f3', '#ffcceb', '#6ab82c',
+                '#f2cc03', '#58c3e0', '#b58453', '#e3701e', '#aaff7b',
+                '#FFCEA6', '#bfbfbf'
+            ];
+            return colorList[i];
+	}
+	
+	function maxLabel(data){
+    	for(var i=0; i<data.length; i++){
+	    	var keys = d3.keys(data[i]);
+	    	var max = 0, maxlabel = '';
+	    	keys.forEach(function(key){
+	    		var num = +data[i][key] + 0.0;
+	    		maxlabel = max > num ? maxlabel : key;
+	    		 max = max > num ? max : num;
+	    	})
+	    	data[i].class = maxlabel;
+            data[i].classValue = max;
+    	}
+    };
+
+	function dimData(cNum){
+		var dimData = [];
+	    for (var i = 0; i < cNum; i++) {
+	                dimData[i] = 1;
+	    }
+	    return dimData;
+	}
+	
+	function type(data){
+		var name = dimensions_name(cNum);
+    	for(var i=0; i<name.length; i++)	
+    		data[name[i]] = +data[name[i]];
+
+    	return data;
+	}
+
+	//匿名函数的使用
+    d3.csv('data/serum_9.csv',type,draw)
+
+</script>
+</body>
+</html>

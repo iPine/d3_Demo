@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>bubble-animation</title>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+	var url = "https://gist.githubusercontent.com/d3byex/8fcf43e446b1e4dd0146/raw/7a11679cb4a810061dee660be0d30b6a9fe69f26/lfp_all.csv";
+	d3.csv(url,function(err,rawdata){
+		var data = rawdata.map(function(d){
+			return {
+					CountryCode: d.CountryCode,
+                    CountryName: d.CountryName,
+                    LifeExp: +d.LifeExp,
+                    FertRate: +d.FertRate,
+                    Population: +d.Population,
+                    Region: d.Region,
+                    Year: d.Year
+            };
+        });
+
+        //按年对data进行分组
+        var nested = d3.nest().key(function(d){return d.Year;})
+        					.sortKeys(d3.ascending)
+        					.map(data);
+
+
+   			var minBubbleSize = 5, maxBubbleSize = 50;
+            var margin = {
+                left: maxBubbleSize, top: maxBubbleSize,
+                bottom: maxBubbleSize, right: maxBubbleSize
+            };
+
+            var axisPadding = 10;
+            var graphWidth = 500, graphHeight = 400;
+            var totalWidth = graphWidth + margin.left + margin.right;
+            var totalHeight = graphHeight + margin.top + margin.bottom;
+
+            var lifeExpectancy = data.map(function (d) { return d.LifeExp; });
+            var fertilityRate = data.map(function (d) { return d.FertRate; });
+            var population = data.map(function (d) { return d.Population; });
+            var regions = data.map(function (d) { return d.Region; });
+
+            var xScale = d3.scale.linear()
+                .domain([d3.min(lifeExpectancy), d3.max(lifeExpectancy)])
+                .range([0, graphWidth]);
+
+            var yScale = d3.scale.linear()
+                .domain([d3.max(fertilityRate), 0])
+                .range([0, graphHeight]);
+
+        	var popDomain = [d3.min(population), d3.max(population)];
+            var popScale = d3.scale.linear()
+                .domain(popDomain)
+                .range([minBubbleSize, maxBubbleSize]);
+
+            var uniqueRegions = d3.set(regions).values();
+            var regionColorMap = d3.scale.ordinal()
+                .domain(uniqueRegions)
+                .range(d3.scale.category10().range());
+
+
+            var svg = d3.select('body')
+                .append('svg')
+                .attr('width', totalWidth)
+                .attr('height', totalHeight);
+
+            var yAxis = d3.svg.axis().scale(yScale).orient('left');
+            var yAxisNodes = svg.append('g')
+                .attr('transform', 'translate(' + (margin.left - axisPadding) + ',' + margin.top + ')')
+                .call(yAxis);
+            styleAxisNodes(yAxisNodes);
+            var xAxis = d3.svg.axis().scale(xScale).orient('bottom');
+            var xAxisNodes = svg.append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + (totalHeight - margin.bottom + axisPadding) + ')')
+                .call(xAxis);
+            styleAxisNodes(xAxisNodes);
+
+        //左下角显示年份
+        var yearLabel = svg.append('g')
+        			.append('text')
+        			.attr('transform','translate(40,450)')
+        			.attr('font-size',75);
+
+        //将气泡的展示放在一个函数里，便于循环展示
+        var bubblesHolder = svg.append('g');
+        var interval = 200;
+
+        function render(currentYear){
+        	var dataForYear = nested[currentYear];
+
+        	var bubbles = bubblesHolder.selectAll('circle')
+        					.data(dataForYear,function(datum){
+        						return datum.CountryCode;
+        					});
+        	//只传dataForYear也行，后面部分表示关键字。D3通过关键字决定进入什么模式
+
+        	//进入-更新-退出模式
+        	//属性设置，单独写成一个函数
+        	bubbles.enter()
+        			.append('circle')
+        			.each(setItemAttributes);
+
+        	bubbles.transition().duration(interval)
+        			.each(setItemAttributes);
+
+        	bubbles.exit().remove();
+        //更新左下角显示的年份
+        	yearLabel.text(currentYear);
+        };
+
+        function setItemAttributes(d){
+        	d3.select(this).attr({
+        		cx: xScale(d.LifeExp),
+        		cy: yScale(d.FertRate),
+        		r: popScale(d.Population),
+        		//注意这里的用法
+        		style: 'fill:' + regionColorMap(d.Region) + ';' + 'fill-opacity:0.5;' + 'stroke:' + regionColorMap(d.Region) + ';'
+        	});
+        };
+
+        //时间容器的设置，如何更新
+        var minYear = d3.min(data,function(d){return d.Year;});
+        var maxYear = d3.max(data, function (d) { return d.Year; });
+
+            var currentYear = minYear;
+            //加载页面时，展示第一年
+            render(currentYear);
+//设置回调函数，如何执行
+        var callback = function(){
+        	return function(){
+        		currentYear++;
+
+        		if(currentYear <= maxYear){
+        			render(currentYear);
+        			//参数1：回调函数；参数2：延迟时间；参数3：默认值是现在时间
+        			//参数2、3是可选写的，2者相加为开始执行的时间，一直执行直到回调函数返回true
+        			d3.timer(callback(),interval);
+        		}
+        		//每执行一次返回true，时间器执行完一次
+        		return true;
+        	}
+        }
+//调用时间器，循环展示
+        d3.timer(callback(),interval);
+		
+	});
+
+	function styleAxisNodes(axisNodes) {
+            axisNodes.selectAll('.domain')
+                .attr({
+                    fill: 'none',
+                    'stroke-width': 1,
+                    stroke: 'black'
+                });
+            axisNodes.selectAll('.tick line')
+                .attr({
+                    fill: 'none',
+                    'stroke-width': 1,
+                    stroke: 'black'
+                });
+    }
+</script>
+</body>
+</html>

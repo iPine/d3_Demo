@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>stacked_bar graph</title>
+</head>
+<body>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+	var url = 'https://gist.githubusercontent.com/d3byex/25129228aa50c30ef01f/raw/17838a0a03d94328a529de1dd768e956ce217af1/stacked_bars.csv';
+	d3.csv(url,function(err,data){
+//获取每个年龄段域名，返回到keys数组
+		var keys = d3.keys(data[0])
+					.filter(function(key){
+						return key !== "State";
+					});
+//获取想要的数据结构，将每个州和一个年龄段的数据放在一个对象里，总共7个对象（7个年龄段）
+		var statesAndAges = keys.map(function(ageRange){
+			return data.map(function(d){
+				return {
+					x: d.State,
+					y: +d[ageRange]
+				};
+			});
+		});
+		console.log(statesAndAges);
+//创建堆叠图数据格式		
+		var stackedData = d3.layout.stack()(statesAndAges);
+
+		var width = 960, height = 500;
+		var svg = d3.select('body')
+					.append("svg")
+					.attr({
+						width: width,
+						height: height
+					});
+
+		var yScale = d3.scale.linear()
+						.domain([0,
+					//这里的d还是对象，共7个
+							d3.max(stackedData,function(d){
+					//这里的dd是每个对象d里的每一项。还是相当于作两次循环，每个年龄段d里的每个州的y和y0累加，有多少州就累加了多少个值，最后取最大的。
+								return d3.max(d,function(dd){
+									return dd.y0 + dd.y;
+								});
+							})
+							])
+						.range([0,height]);
+
+		var xScale = d3.scale.ordinal()
+		//州的总个数
+						.domain(d3.range(stackedData[0].length))
+						.rangeRoundBands([0,width],0.05);
+
+		var colors = d3.scale.ordinal()
+			.range(["#98abc5", "#8a89a6", "#7b6888",
+                        "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+//给每条路径上色
+		var pathGroups = svg.selectAll("path")
+						.data(stackedData)
+						.enter()
+						.append("path")
+						.style("fill",function(d,i){
+							return colors(i);
+						});
+//路径转成面积，需要area生成器
+		var area = d3.svg.area()
+				.x(function(d,i){
+					return xScale(i);
+				})
+//面积底部
+				.y0(function(d){
+					return height - yScale(d.y0)
+				})
+//面积上部
+				.y1(function(d){
+					return height - yScale(d.y+d.y0);
+				});
+
+		// svg.selectAll('path')
+		// 	.data(stackedData)
+		pathGroups
+			.transition()
+			.attr('d',function(d){
+		//对每个序列，即每个年龄段都要调用area生成器
+				return area(d);
+			});
+
+	});
+</script>
+</body>
+</html>

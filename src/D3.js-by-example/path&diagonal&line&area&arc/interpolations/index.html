@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>interpolations</title>
+</head>
+
+<body>
+<form>
+    <select id="interpolations"></select>
+    <select id="tensions"></select>
+    <br />
+
+    <svg id="graph"></svg>
+</form>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+    var width = 400, height = 200, margin = 10;
+
+    var numpoints = 8;
+    var sine = d3.range(0, numpoints + 1).map(
+        function(i) {
+            return [
+                (2.0 / numpoints) * i * Math.PI,
+                Math.sin((2.0 / numpoints) * i * Math.PI)
+            ];
+        });
+
+    var xScale = d3.scale.linear()
+        .domain(d3.extent(sine, function(d) {
+            return d[0];
+        }))
+        .range([0, width - margin * 2]);
+    var yScale = d3.scale.linear()
+        .domain([-1, 1])
+        .range([height - margin, 0]);
+
+    var interpolations = [
+        "linear",
+        "linear-closed",
+        "step-before",
+        "step-after",
+        "basis",
+        "basis-open",
+        "basis-closed",
+        "cardinal",
+        "cardinal-open",
+        "cardinal-closed",
+        "monotone",
+        "bundle"
+    ];
+
+    d3.select("#interpolations")
+        .on("change", redraw)
+        .selectAll("option")
+        .data(interpolations)
+        .enter().append("option")
+        .attr("value", function(d) { return d; })
+        .text(function(d) { return d; });
+
+    var tensions = [1.0, 0.75, 0.5, 0.25, 0.0];
+    d3.select("#tensions")
+//调用绘制函数
+        .on("change", redraw)
+//所有下拉框的值，叫做"option"
+        .selectAll("option")
+        .data(tensions)
+        .enter().append("option")
+        .attr("value", function(d) { return d; })
+        .text(function(d) { return d; });
+
+    var svg = d3.select('body')
+        .append('svg')
+        .attr('width', width + 2 * margin)
+        .attr('height', height + 2 * margin);
+
+    var graphGroup = svg.append('g')
+        .attr('transform', 'translate(' + margin + ', ' +
+            margin + ')');
+//首次调用
+    redraw();
+
+    function redraw() {
+//获取当前选择插值器类型的值
+        var interpolationSel = document.getElementById('interpolations');
+        var interpolation = interpolationSel.options[
+            interpolationSel.selectedIndex].value;
+//将之前存在的路径remove掉
+        graphGroup.selectAll('path').remove();
+
+        var line = d3.svg.line()
+            .interpolate(interpolation)
+            .tension(0.5)
+            .x(function(d) { return xScale(d[0]); })
+            .y(function(d) { return yScale(d[1]); });
+//若类型是"bundle"，则判断选择的张力值是什么
+        if (interpolation === "bundle") {
+            var tensionsSel = document.getElementById('tensions');
+            var tension = tensionsSel.options[
+                tensionsSel.selectedIndex].value;
+            line.tension(tension);
+        }
+
+        graphGroup.append('path')
+//这里用的datum,因为"path"是用的"linear"插值器。可以不用进入那3个模式
+            .datum(sine)
+            .attr({
+                d: line,
+                stroke: 'steelblue',
+                'stroke-width': 2,
+                fill: 'none'
+            });
+
+        graphGroup.append("g").selectAll("circle")
+//用的data,则需要那三个模式才能更新。但在这个例子，圆点不用更新
+            .data(sine).enter().append("circle")
+            .attr({
+                fill: '#fff',
+                stroke: 'steelblue',
+                cx: function(d) { return xScale(d[0]); },
+                cy: function(d) { return yScale(d[1]); },
+                r: 4.5
+            });
+    }
+</script>
+</body>
+</html>

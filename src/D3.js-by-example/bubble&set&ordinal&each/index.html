@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>bubblePlot</title>
+</head>
+<body>
+<script type="text/javascript" src='http://d3js.org/d3.v3.min.js'></script>
+<script type="text/javascript">
+	var url = "https://gist.githubusercontent.com/d3byex/30231953acaa9433a46f/raw/6c7eb1c562de92bdf8d0cd99c6912048161c187e/fert_pop_exp.csv";
+	d3.csv(url,function(err,rawdata){
+		var data = rawdata.map(function(d){
+			return {
+				CountryCode: d.CountryCode,
+                CountryName: d.CountryName,
+                LifeExp: +d.LifeExp,
+                FertRate: +d.FertRate,
+                Population: +d.Population,
+                Region: d.Region
+			}
+		});
+		var minBubbleSize = 5, maxBubbleSize = 50;
+        var margin = {
+                left: maxBubbleSize, top: maxBubbleSize,
+                bottom: maxBubbleSize, right: maxBubbleSize
+            };
+        var axisPadding = 10;
+        var graphWidth = 500, graphHeight = 400;
+        var totalWidth = graphWidth + margin.left + margin.right;
+        var totalHeight = graphHeight + margin.top + margin.bottom;
+
+        var lifeExpectancy = data.map(function (d) { return d.LifeExp; });
+        var fertilityRate = data.map(function (d) { return d.FertRate; });
+        var population = data.map(function (d) { return d.Population; });
+        var regions = data.map(function (d) { return d.Region; });
+
+        var xScale = d3.scale.linear()
+        			.domain([d3.min(lifeExpectancy), d3.max(lifeExpectancy)])
+        			.range([0,graphWidth]);
+
+        var yScale = d3.scale.linear()
+                .domain([d3.max(fertilityRate), 0])//y轴最小值从0开始
+                .range([0, graphHeight]);
+
+        var popDomain = [d3.min(population),d3.max(population)];
+        var popScale = d3.scale.linear()
+        		.domain(popDomain)
+        		.range([minBubbleSize,maxBubbleSize]);
+
+        var uniqueRegions = d3.set(regions).values();//这里是获取regions的值。set的用法？
+        var regionColorMap = d3.scale.ordinal()
+        		.domain(uniqueRegions)
+        		.range(d3.scale.category10().range());//注意这里的用法
+
+
+        var svg = d3.select("body").append('svg')
+                .attr('width', totalWidth)
+                .attr('height', totalHeight);
+
+
+            var yAxis = d3.svg.axis().scale(yScale).orient('left');
+            var yAxisNodes = svg.append('g')
+                .attr('transform', 'translate(' + (margin.left - axisPadding) + ',' + margin.top + ')')
+                .call(yAxis);
+            styleAxisNodes(yAxisNodes);
+            var xAxis = d3.svg.axis().scale(xScale).orient('bottom');
+            var xAxisNodes = svg.append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + (totalHeight - margin.bottom + axisPadding) + ')')
+                .call(xAxis);
+            styleAxisNodes(xAxisNodes);
+
+            svg.append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+                .selectAll('circle')
+                .data(data)
+                .enter()
+                .append('circle')
+             //这里each的用法，选this,返回正在应用函数的当前项 
+                .each(function (d) {
+                    d3.select(this).attr({
+                        cx: xScale(d.LifeExp),
+                        cy: yScale(d.FertRate),
+                        r: popScale(d.Population),
+                        fill: regionColorMap(d.Region),
+                        stroke: regionColorMap(d.Region),
+                        'fill-opacity': 0.5
+                    });
+                });
+	})
+
+	function styleAxisNodes(axisNodes) {
+            axisNodes.selectAll('.domain')
+                .attr({
+                    fill: 'none',
+                    'stroke-width': 1,
+                    stroke: 'black'
+                });
+            axisNodes.selectAll('.tick line')
+                .attr({
+                    fill: 'none',
+                    'stroke-width': 1,
+                    stroke: 'black'
+                });
+    }
+</script>
+</body>
+</html>

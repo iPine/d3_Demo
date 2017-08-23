@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Packed Bubbles</title>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+	 url = 'https://gist.githubusercontent.com/d3byex/25129228aa50c30ef01f/raw/11fe9418fba81e254ad0f629b592f9e33c3241c6/sales_rollup.json';
+	 d3.json(url,function(err,data){
+	 	var diameter = 500;
+
+	 	var svg = d3.select('body')
+	 				.append('svg')
+	 				.attr({
+	 					width: diameter,
+	 					height: diameter
+	 				});
+//使用包布局，圆形长宽都为半径，value为具体的值
+	 	var pack = d3.layout.pack()
+	 		.size([diameter,diameter])
+	 		.value(function(d){return d.value;});
+//注意如何传数据获取节点信息，先是datum(data)获得所有值？
+	 	var nodes = svg.datum(data)
+	 				.selectAll('g')
+	 				.data(pack.nodes)
+	 				.enter()
+	 				.append('g')
+	 				.attr('transform', function (d) {
+                    return 'translate(' + d.x + ',' + d.y + ')';
+                });
+        nodes.append('circle')
+        	.each(function(d){
+        		d3.select(this)
+        			.attr({
+        		//d.r是nodes的数据
+        				r: d.r,
+        				fill: d.children ? 'rgb(31, 119, 180)' : '#ff7f0e',
+        				'fill-opacity': d.children ? 0.25 : 1.0,
+                            stroke: d.children ? 'rgb(31, 119, 180)' : 'none'
+        			});
+        	});
+//将没有孩子节点的节点过滤出来，添加文本信息
+        nodes.filter(function(d){
+        	return !d.children;
+        }).append('text')
+        	.attr('dy','.3em')
+        	.style({
+        		 'text-anchor': 'middle',
+                 'font': '8px sans-serif'
+        	})
+        	.text(function(d){
+        		//显示长度，规定小于三分之一个半径
+        		return d.name.substring(0,d.r/3);
+        	});
+	 });
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cluster Dendrogram</title>
+</head>
+<body>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+	var url =  'https://gist.githubusercontent.com/d3byex/25129228aa50c30ef01f/raw/2f8664d0eb75ef606f412f9647116954ff0af41d/radial.json'; //url='https://gist.githubusercontent.com/d3byex/25129228aa50c30ef01f/raw/ddc1d7cf560f8fff84dd9005e5bdbdd43b39a91f/flare.json';
+	d3.json(url,function(err,data){
+		var width = 500,
+                height = 500,
+                nodeRadius = 4.5;
+
+        var svg = d3.select('body')
+                .append('svg')
+                .attr({
+                    width: width,
+                    height: height
+                });
+
+        var radius = width / 2;
+        var mainGroup = svg.append('g')
+                .attr("transform", "translate(" + radius + "," + radius + ")");
+//定义聚类布局，第一参点在外圆上扫过的度数，第二参树的深度，即最外圈的半径
+        var cluster = d3.layout.cluster()
+        		.size([360,radius-50]);
+
+        var nodes = cluster.nodes(data);
+        var links = cluster.links(nodes);
+//生成的数据中x是从垂直开始的角度，y是那个方向上的距离
+        console.log('');
+//.radial()形式的斜线生成器，告诉它如何找y和x的值，且要将x转换成弧度
+        var diagonal = d3.svg.diagonal.radial()
+        		.projection(function(d){
+        			return [d.y,d.x / 180*Math.PI];
+        		});
+//添加连线
+        mainGroup.selectAll('path')
+                .data(links)
+                .enter()
+                .append('path')
+                .attr({
+                    'd': diagonal,
+                    fill: 'none',
+                    stroke: '#ccc',
+                    'stroke-width': 2
+                });
+//添加节点，并放在正确位置
+// 将计算的角度旋转90度。会改变文字的方向使其沿着对角线显示。旋转是对度数，而不是弧度。平移只作用在y,它将组沿着指定的角度往外移动该距离长。
+        var nodesGroups = mainGroup.selectAll('g')
+        		.data(nodes)
+        		.enter()
+        		.append('g')
+        		.attr("transform",function(d){
+        	//单双引号要一致，用单就全单，双就全双
+        			return 'rotate('+(d.x-90)+')translate('+d.y+')';
+        		});
+//节点绘圆
+        nodesGroups.append('circle')
+        		.attr({
+                    r: nodeRadius,
+                    fill: '#fff',
+                    stroke: 'steelblue',
+                    'stroke-width': 3
+                });
+//添加文本，重点是文本位置的设定
+//左侧，文本结束位置与节点相对齐；右侧，文本开始位置与节点相对齐。因为从12点方向开始是0度，所以是右边小于180度
+// 右边，直接往右平移2个半径;左边，先转180，再往左移2个半径
+        nodesGroups.append('text')
+        		.attr({
+        			dy:'.31em',
+     
+        			'text-anchor':function(d){
+        				return d.x < 180? 'start':'end';
+        			},
+     
+        			'transform':function(d){
+        				return d.x < 180? 'translate('+nodeRadius*2+')': 'rotate(180)translate('+(-nodeRadius*2)+')';
+        			}
+        		})
+        		.style('font','12px sans-serif')
+        		.text(function(d){return d.name;});
+
+	});
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>how to use map/scale/bands</title>
+</head>
+<body>
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
+	var url = "https://gist.githubusercontent.com/d3byex/e5ce6526ba2208014379/raw/8fefb14cc18f0440dc00248f23cbf6aec80dcc13/walking_dead_s5.json";
+	d3.json(url,function(err,data){
+		var viewership = data.map(function(d){
+			return d.USViewers;
+		});
+		// console.log(viewership);
+
+		var maxViewers = d3.max(viewership);
+		var margin = {top:10, right:40, bottom:160, left:85};
+		var graphWidth = 500, graphHeight = 300;
+
+		var totalWidth = graphWidth+margin.left+margin.right;
+		var totalHeight = graphHeight+margin.top+margin.bottom;
+
+
+		var svg = d3.select("body").append("svg")
+					.attr({
+						width: totalWidth,
+						height: totalHeight
+					});
+		var mainGraph = svg.append("g")
+					.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+		var bands = d3.scale.ordinal()
+					.domain(viewership)
+					.rangeBands([0,graphWidth],0.3);//这里是rangeBands
+
+		var yScale = d3.scale.linear()
+					.domain([0,maxViewers])
+					.range([0,graphHeight]);
+//bands.range()返回的是每个范围的起始值组成的数组
+		function translator(d,i){
+			return "translate("+bands.range()[i]+","+(graphHeight-yScale(d))+")";
+		}
+
+		var barGraph = mainGraph.selectAll('g')
+					.data(viewership)
+					.enter()
+					.append('g')
+					.attr('transform', translator);
+
+		barGraph.append('rect')
+			.attr({
+				fill: 'teal',
+				width: bands.rangeBand(),//返回每个范围的大小，不是rangeBands
+				height: function(d){return yScale(d);}
+			});
+		barGraph.append('text')
+			.text(function(d){return d;})
+			.style('text-anchor', 'start')
+			.attr({
+				dx: 10,
+				dy: -10,
+				transform: "rotate(90)",
+				'font-size':'10px',
+				fill: "white"
+			});
+// console.log(bands.rangeBand());
+	var leftAxisGroup = svg.append('g');
+	var axisPadding = 3;
+
+		leftAxisGroup.attr('transform', 'translate(' + (margin.left - axisPadding) + ',' + margin.top + ')');
+
+	var yAxisScale = d3.scale.linear()
+					.domain([maxViewers,0])
+					.range([0,graphHeight]);
+	var leftAxis = d3.svg.axis()
+					.orient('left')
+					.scale(yAxisScale);
+
+	var leftAxisNodes =leftAxisGroup.call(leftAxis);
+	styleAxisNodes(leftAxisNodes);
+
+	var bottomAxisX = margin.left - axisPadding;
+	var bottomAxisY = totalHeight - margin.bottom+axisPadding;
+	var bottomAxisGroup = svg.append('g')
+				.attr('transform', 'translate(' + bottomAxisX + ',' + bottomAxisY + ')');
+
+	var title = data.map(function(d){return d.Title;});
+	var bottomAxisScale = d3.scale.ordinal()
+				.domain(title)
+				.rangeBands([axisPadding,graphWidth+axisPadding]);
+
+	var bottomAxis = d3.svg.axis()
+				.scale(bottomAxisScale)
+				.orient("bottom");
+	var bottomAxisNodes = bottomAxisGroup.call(bottomAxis);
+	styleAxisNodes(bottomAxisNodes);
+
+	bottomAxisNodes.selectAll('text')
+		.style('text-anchor','start')
+		.attr({
+			dx:5,
+			dy: -5,
+			transform: "rotate(45)",
+			'font-size':'16px'
+		});
+
+	function styleAxisNodes(axisNodes){
+		axisNodes.selectAll('.domain')
+			.attr({
+				fill:'none',
+				"stroke-width": 1,
+				stroke: 'black'
+			});
+		axisNodes.selectAll('.tick line')
+			.attr({
+				fill:'none',
+				'stroke-width':1,
+				stroke: 'black'
+			});
+	}
+	});
+</script>
+</body>
+</html>

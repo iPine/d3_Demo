@@ -68,7 +68,7 @@
 		var xRangeWidth = svgWidth - padding.left - padding.right;
 		var xScale = d3.scale.ordinal()
 						//.domain(d3.range(dataset.length))
-						//dataset = [[0-4],[0-4],[0-4]]
+						//dataset = [{[0-4]},{[0-4]},{[0-4]}]
 						.domain(data[0].sales.map(function(d){
 							return d.day;
 						}))
