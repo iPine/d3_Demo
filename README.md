@@ -149,4 +149,25 @@
 ### day-20-12-22
 #### WorldCup_map_final.html [演示](http://ipine.coding.me/d3-Demo/src/day-20-12-22/WorldCup_map.html)
 
+### D3.js by example
+### bubble&animation&nest&timer
+#### index.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/bubble&animation&nest&timer/index.html)
+
+### bubble&set&ordinal&each
+#### index.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/bubble&set&ordinal&each/index.html)
+
+### force&information_networks
+#### simple.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/force&information_networks/simple.html)
+#### stick&release.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/force&information_networks/stick&release.html)
+#### label_nodes&charge.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/force&information_networks/label_nodes&charge.html)
+#### directionality_markers.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/force&information_networks/directionality_markers.html)
+
+### interaction
+#### linchart.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/interaction/brush&(context+focus)/linchart.html)
+
+### scatter&gridlines
+#### index.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/scatter&gridlines/index.html)
+
+### layout
+#### sankey.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/layout/sankey/sankey.html)
 
