@@ -21,9 +21,14 @@
 //orthographic将数据投影成模拟的球形
         // var projection = d3.geo.mercator()
          var projection = d3.geo.orthographic()
-    //width = 2*PI*r 留1px空隙，求出r
-                .scale((width+1)/2/Math.PI)
-                .translate([width/2,height/2]);
+         //要显示的度数，默认360
+         					.clipAngle(90)
+    //width = 2*PI*r 留1px空隙，求出r,缩放r那么大，默认值150
+                // .scale((width+1)/2/Math.PI)
+                .scale(300)
+                .translate([width/2,height/2])
+        //默认展示以经纬度为0为中心的区域，可旋转到任意位置
+                .rotate([90, -40]);
         var path = d3.geo.path()
                 .projection(projection);
 //topojson.js全局声明了topojson变量。.feature()函数，当给定一个TopoJSON对象（在这种情况下是world））和一个GeometryCollection（在这种情况下是world.objects.countries）时，返回一个GeoJSON功能，可以被路径使用
