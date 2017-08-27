@@ -171,3 +171,8 @@
 ### layout
 #### sankey.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/layout/sankey/sankey.html)
 
+### map
+#### pan_and_zoom.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/map/interactive/pan_and_zoom.html)
+#### mousemove&rotate.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/map/interactive/mousemove&rotate.html)
+#### circlePinnedAtLat&Long&queue.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/map/annotateMap/circlePinnedAtLat&Long&queue.html)
+#### choropleth&queue&mesh&quantize.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/map/annotateMap/choropleth&queue&mesh&quantize.html)
