@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style></style>
+</head>
+<body>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+    <script src="app.js"></script>
+    <script src="directives/bars.js"></script>
+    <script src="controllers/basic_dashboard.js"></script>
+<!-- ng-app指明应用程序对象的名称，告诉angularJS在哪里找应用对象 
+ng-controller指令控制器，用来传递数据给指令-->
+    <div ng-app="dashboardApp" ng-controller="dashboardController">
+    <!--angular指令是一个自定义标签，命令其如何创建HTML。bars-view标签是指令模块的第一个参数；指令模块是实现模块  -->
+        <bars-view width="500" height="105"></bars-view>
+    </div>
+</body>
+</html>
