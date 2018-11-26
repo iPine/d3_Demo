@@ -43,6 +43,7 @@
 #### chord demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/chord_demo.html)
 
 #### pack demo [演示](http://ipine.coding.me/d3-Demo/src/day-5/pack_demo.html)
+
 ### day-6
 #### geo map [演示](http://ipine.coding.me/d3-Demo/src/day-6/geo_map.html)
 
@@ -79,7 +80,6 @@
 
 ### day-9
 #### force geo map [演示](http://ipine.coding.me/d3-Demo/src/day-9/force_geo_map.html)
-
 #### readDSV
 
 ### day-10
@@ -136,9 +136,9 @@
 ### day-17-12-14
 #### selection_data_2dimension
 
-####barchart_letters_frequency [演示](http://ipine.coding.me/d3-Demo/src/day-17-12-14/barchart_letters_frequency.html)
+#### barchart_letters_frequency [演示](http://ipine.coding.me/d3-Demo/src/day-17-12-14/barchart_letters_frequency.html)
 
-####line_letters_frequency [演示](http://ipine.coding.me/d3-Demo/src/day-17-12-14/line_letters_frequency.html)
+#### line_letters_frequency [演示](http://ipine.coding.me/d3-Demo/src/day-17-12-14/line_letters_frequency.html)
 
 ### day-18-12-17
 #### WorldCup_circles_d3.html [演示](http://ipine.coding.me/d3-Demo/src/day-18-12-17/WorldCup_circles_d3.html) 
@@ -149,7 +149,8 @@
 ### day-20-12-22
 #### WorldCup_map_final.html [演示](http://ipine.coding.me/d3-Demo/src/day-20-12-22/WorldCup_map.html)
 
-### D3.js by example
+
+## D3.js by example
 ### bubble&animation&nest&timer
 #### index.html [演示](http://ipine.coding.me/d3-Demo/src/D3.js-by-example/bubble&animation&nest&timer/index.html)
 
